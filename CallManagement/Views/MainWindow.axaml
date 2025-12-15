@@ -1,12 +1,12 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:TEST.ViewModels"
-        xmlns:models="using:TEST.Models"
-        xmlns:conv="using:TEST.Converters"
+        xmlns:vm="using:CallManagement.ViewModels"
+        xmlns:models="using:CallManagement.Models"
+        xmlns:conv="using:CallManagement.Converters"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
-        x:Class="TEST.Views.MainWindow"
+        x:Class="CallManagement.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="Call Manager"
@@ -28,6 +28,10 @@
         <conv:StepToVisibilityConverter x:Key="StepToVisibility"/>
         <conv:InverseBoolConverter x:Key="InverseBool"/>
         <conv:StepIndicatorBrushConverter x:Key="StepIndicatorBrush"/>
+        <conv:StringHasContentConverter x:Key="StringHasContent"/>
+        <conv:StringToPlaceholderVisibilityConverter x:Key="StringToPlaceholder"/>
+        <conv:BoolToFontWeightConverter x:Key="BoolToFontWeightConverter"/>
+        <conv:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
     </Window.Resources>
 
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -61,7 +65,7 @@
                     <Button Classes="topBarButton" 
                             x:Name="ImportButton"
                             Command="{Binding ImportExcelCommand}"
-                            ToolTip.Tip="Import file Excel chứa danh sách gọi">
+                            ToolTip.Tip="Import file Excel chứa danh sách gọi (⌘I / Ctrl+I)">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="📥" FontSize="16"/>
                             <TextBlock Text="Import Excel" VerticalAlignment="Center"/>
@@ -72,10 +76,35 @@
                     <Button Classes="topBarButton"
                             x:Name="ExportButton"
                             Command="{Binding ExportExcelCommand}"
-                            ToolTip.Tip="Xuất kết quả cuộc gọi ra file Excel">
+                            ToolTip.Tip="Xuất kết quả cuộc gọi ra file Excel (⌘E / Ctrl+E)">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="📤" FontSize="16"/>
                             <TextBlock Text="Export Excel" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <!-- Separator -->
+                    <Border Width="1" Height="24" Background="{StaticResource BorderLightBrush}" Margin="8,0"/>
+                    
+                    <!-- Save Session Button -->
+                    <Button Classes="topBarButton primary"
+                            Command="{Binding SaveSessionCommand}"
+                            IsEnabled="{Binding IsCurrentTabEditable}"
+                            ToolTip.Tip="Lưu phiên hiện tại vào database (⌘S / Ctrl+S)">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="💾" FontSize="16"/>
+                            <TextBlock Text="Save Session" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <!-- Clear Session Button -->
+                    <Button Classes="topBarButton"
+                            Command="{Binding ClearCurrentSessionCommand}"
+                            IsEnabled="{Binding IsCurrentTabEditable}"
+                            ToolTip.Tip="Xóa dữ liệu phiên hiện tại">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="🗑️" FontSize="16"/>
+                            <TextBlock Text="Clear" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     
@@ -91,9 +120,24 @@
                 </StackPanel>
             </Grid>
         </Border>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- LOADING OVERLAY -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Border Grid.Row="0" Grid.RowSpan="2"
+                IsVisible="{Binding IsLoading}"
+                Background="{StaticResource OverlayBackgroundBrush}"
+                ZIndex="100">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+                <TextBlock Text="⏳" FontSize="48" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding StatusMessage}" 
+                           Classes="bodySecondary"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
 
         <!-- ═══════════════════════════════════════════════════════════════════ -->
-        <!-- MAIN CONTENT AREA -->
+        <!-- MAIN CONTENT AREA WITH TABCONTROL -->
         <!-- ═══════════════════════════════════════════════════════════════════ -->
         <Grid Grid.Row="1" ColumnDefinitions="240,*">
             
@@ -104,243 +148,625 @@
                     Background="{StaticResource SidebarBackgroundBrush}"
                     BorderBrush="{StaticResource BorderLightBrush}"
                     BorderThickness="0,0,1,0"
-                    Padding="16">
-                <StackPanel Spacing="20">
+                    IsVisible="{Binding IsSidebarVisible}">
+                <Grid RowDefinitions="Auto,*,Auto">
                     
-                    <!-- Statistics Section -->
-                    <StackPanel Spacing="12">
-                        <TextBlock Classes="heading3" Text="Thống kê"/>
-                        
-                        <!-- Total -->
-                        <Border Classes="card" Padding="12">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock Classes="bodySecondary" Text="Tổng số" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Classes="heading3" Text="{Binding TotalCount}"/>
-                            </Grid>
-                        </Border>
-                        
-                        <!-- Answered -->
-                        <Border Classes="card" Padding="12">
-                            <Grid ColumnDefinitions="Auto,*,Auto">
-                                <Border Width="8" Height="8" CornerRadius="4" Background="{StaticResource SuccessBrush}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Classes="bodySecondary" Text="Nghe máy" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="2" Classes="body" FontWeight="SemiBold" Text="{Binding AnsweredCount}" Foreground="{StaticResource SuccessTextBrush}"/>
-                            </Grid>
-                        </Border>
-                        
-                        <!-- No Answer -->
-                        <Border Classes="card" Padding="12">
-                            <Grid ColumnDefinitions="Auto,*,Auto">
-                                <Border Width="8" Height="8" CornerRadius="4" Background="{StaticResource NeutralBrush}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Classes="bodySecondary" Text="Không nghe" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="2" Classes="body" FontWeight="SemiBold" Text="{Binding NoAnswerCount}" Foreground="{StaticResource NeutralTextBrush}"/>
-                            </Grid>
-                        </Border>
-                        
-                        <!-- Invalid -->
-                        <Border Classes="card" Padding="12">
-                            <Grid ColumnDefinitions="Auto,*,Auto">
-                                <Border Width="8" Height="8" CornerRadius="4" Background="{StaticResource ErrorBrush}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Classes="bodySecondary" Text="Số sai" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="2" Classes="body" FontWeight="SemiBold" Text="{Binding InvalidCount}" Foreground="{StaticResource ErrorTextBrush}"/>
-                            </Grid>
-                        </Border>
-                        
-                        <!-- Busy -->
-                        <Border Classes="card" Padding="12">
-                            <Grid ColumnDefinitions="Auto,*,Auto">
-                                <Border Width="8" Height="8" CornerRadius="4" Background="{StaticResource WarningBrush}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Classes="bodySecondary" Text="Máy bận" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="2" Classes="body" FontWeight="SemiBold" Text="{Binding BusyCount}" Foreground="{StaticResource WarningTextBrush}"/>
-                            </Grid>
-                        </Border>
-                    </StackPanel>
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <!-- SIDEBAR HEADER -->
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <Border Grid.Row="0" 
+                            Padding="16,12"
+                            BorderBrush="{StaticResource BorderLightBrush}"
+                            BorderThickness="0,0,0,1">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="heading3" Text="📂 Sessions" VerticalAlignment="Center"/>
+                            <Button Grid.Column="1"
+                                    Classes="iconButton"
+                                    Command="{Binding RefreshSessionsCommand}"
+                                    ToolTip.Tip="Refresh sessions">
+                                <TextBlock Text="🔄" FontSize="14"/>
+                            </Button>
+                        </Grid>
+                    </Border>
                     
-                    <!-- Quick Guide -->
-                    <StackPanel Spacing="12">
-                        <TextBlock Classes="heading3" Text="Hướng dẫn nhanh"/>
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <!-- SESSIONS LIST -->
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <ListBox Grid.Row="1" 
+                             ItemsSource="{Binding Sessions}"
+                             SelectedItem="{Binding SelectedSession, Mode=TwoWay}"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Padding="8"
+                             Classes="sessionListBox">
+                        <ListBox.Styles>
+                            <!-- Remove default ListBox selection styling -->
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0,2"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="CornerRadius" Value="8"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Style>
+                            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+                            </Style>
+                            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                            </Style>
+                            <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
+                            </Style>
+                        </ListBox.Styles>
                         
-                        <Border Classes="card" Padding="12">
-                            <StackPanel Spacing="8">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="📞" FontSize="14"/>
-                                    <TextBlock Classes="caption" Text="Nghe máy" Foreground="{StaticResource SuccessTextBrush}"/>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SessionListItemViewModel">
+                                <Grid ColumnDefinitions="Auto,*,Auto" Margin="12,10">
+                                    <!-- Icon -->
+                                    <TextBlock Grid.Column="0" 
+                                               Text="{Binding Icon}" 
+                                               FontSize="14"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,10,0"/>
+                                    
+                                    <!-- Session Name/Time -->
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding DisplayTime}"
+                                               Classes="body"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"
+                                               FontWeight="{Binding IsCurrent, Converter={StaticResource BoolToFontWeightConverter}}"/>
+                                    
+                                    <!-- Contact Count Badge -->
+                                    <Border Grid.Column="2"
+                                            IsVisible="{Binding !IsCurrent}"
+                                            Background="{StaticResource NeutralLightBrush}"
+                                            CornerRadius="10"
+                                            Padding="6,2"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding ContactCount}"
+                                                   FontSize="11"
+                                                   Foreground="{StaticResource TextMutedBrush}"/>
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <!-- STATISTICS PANEL (Bottom) -->
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <Border Grid.Row="2"
+                            BorderBrush="{StaticResource BorderLightBrush}"
+                            BorderThickness="0,1,0,0"
+                            Padding="12">
+                        <StackPanel Spacing="8">
+                            <TextBlock Classes="caption" Text="📊 Statistics" FontWeight="SemiBold"/>
+                            
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="0,4,0,0">
+                                <!-- Total -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Classes="caption" Text="Total" Foreground="{StaticResource TextMutedBrush}"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Classes="body" Text="{Binding TotalCount}" FontWeight="SemiBold"/>
+                                
+                                <!-- Answered -->
+                                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                                    <Border Width="8" Height="8" CornerRadius="4" Background="{StaticResource SuccessBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Classes="caption" Text="Nghe máy" Foreground="{StaticResource TextMutedBrush}"/>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="🔕" FontSize="14"/>
-                                    <TextBlock Classes="caption" Text="Không nghe"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Classes="body" Text="{Binding AnsweredCount}" Foreground="{StaticResource SuccessTextBrush}" Margin="0,4,0,0"/>
+                                
+                                <!-- No Answer -->
+                                <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                                    <Border Width="8" Height="8" CornerRadius="4" Background="{StaticResource NeutralBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Classes="caption" Text="Không nghe" Foreground="{StaticResource TextMutedBrush}"/>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="🚫" FontSize="14"/>
-                                    <TextBlock Classes="caption" Text="Số sai" Foreground="{StaticResource ErrorTextBrush}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Classes="body" Text="{Binding NoAnswerCount}" Foreground="{StaticResource NeutralTextBrush}" Margin="0,4,0,0"/>
+                                
+                                <!-- Invalid -->
+                                <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                                    <Border Width="8" Height="8" CornerRadius="4" Background="{StaticResource ErrorBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Classes="caption" Text="Số sai" Foreground="{StaticResource TextMutedBrush}"/>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="⏳" FontSize="14"/>
-                                    <TextBlock Classes="caption" Text="Máy bận" Foreground="{StaticResource WarningTextBrush}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Classes="body" Text="{Binding InvalidCount}" Foreground="{StaticResource ErrorTextBrush}" Margin="0,4,0,0"/>
+                                
+                                <!-- Busy -->
+                                <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                                    <Border Width="8" Height="8" CornerRadius="4" Background="{StaticResource WarningBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Classes="caption" Text="Máy bận" Foreground="{StaticResource TextMutedBrush}"/>
                                 </StackPanel>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </StackPanel>
+                                <TextBlock Grid.Row="4" Grid.Column="1" Classes="body" Text="{Binding BusyCount}" Foreground="{StaticResource WarningTextBrush}" Margin="0,4,0,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
             </Border>
 
             <!-- ═══════════════════════════════════════════════════════════════ -->
-            <!-- DATA GRID AREA -->
+            <!-- DATA GRID AREA WITH TABCONTROL -->
             <!-- ═══════════════════════════════════════════════════════════════ -->
             <Border Grid.Column="1" Padding="20" Classes="fadeIn">
-                <Border Classes="card" Padding="0" ClipToBounds="True">
-                    <Grid RowDefinitions="Auto,*">
+                <Grid RowDefinitions="Auto,*">
+                    
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <!-- TAB HEADERS -->
+                    <!-- ═══════════════════════════════════════════════════════ -->
+                    <TabControl Grid.Row="0" 
+                                Grid.RowSpan="2"
+                                ItemsSource="{Binding Tabs}"
+                                SelectedItem="{Binding SelectedTab}"
+                                TabStripPlacement="Top"
+                                Classes="sessionTabs">
                         
-                        <!-- Table Header -->
-                        <Border Grid.Row="0" 
-                                Background="{StaticResource NeutralLightBrush}" 
-                                Padding="16,12"
-                                BorderBrush="{StaticResource BorderLightBrush}"
-                                BorderThickness="0,0,0,1">
-                            <Grid ColumnDefinitions="60,*,150,150,180,160">
-                                <TextBlock Grid.Column="0" Classes="caption" FontWeight="SemiBold" Text="#"/>
-                                <TextBlock Grid.Column="1" Classes="caption" FontWeight="SemiBold" Text="Tên"/>
-                                <TextBlock Grid.Column="2" Classes="caption" FontWeight="SemiBold" Text="Số điện thoại"/>
-                                <TextBlock Grid.Column="3" Classes="caption" FontWeight="SemiBold" Text="Công ty"/>
-                                <TextBlock Grid.Column="4" Classes="caption" FontWeight="SemiBold" Text="Trạng thái"/>
-                                <TextBlock Grid.Column="5" Classes="caption" FontWeight="SemiBold" Text="Hành động" HorizontalAlignment="Center"/>
-                            </Grid>
-                        </Border>
+                        <!-- Tab Header Template -->
+                        <TabControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SessionTabViewModel">
+                                <Grid ColumnDefinitions="Auto,Auto,Auto" Margin="4,2">
+                                    <!-- Tab Title -->
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding Title}"
+                                               VerticalAlignment="Center"
+                                               FontWeight="{Binding IsCurrentSession, Converter={StaticResource BoolToFontWeightConverter}}"
+                                               Foreground="{Binding IsCurrentSession, Converter={StaticResource BoolToBrushConverter}}"/>
+                                    
+                                    <!-- Contact Count Badge -->
+                                    <Border Grid.Column="1"
+                                            Background="{StaticResource NeutralLightBrush}"
+                                            CornerRadius="8"
+                                            Padding="6,2"
+                                            Margin="8,0,0,0"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Contacts.Count}"
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    </Border>
+                                    
+                                    <!-- Close Button (only for history tabs) -->
+                                    <Button Grid.Column="2"
+                                            Classes="iconButton"
+                                            Width="20" Height="20"
+                                            Margin="8,0,0,0"
+                                            IsVisible="{Binding IsCurrentSession, Converter={StaticResource InverseBool}}"
+                                            Command="{Binding $parent[TabControl].((vm:MainWindowViewModel)DataContext).CloseTabCommand}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip.Tip="Đóng tab (dữ liệu vẫn được lưu)">
+                                        <TextBlock Text="✕" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </TabControl.ItemTemplate>
                         
-                        <!-- Table Content -->
-                        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                            <ItemsControl ItemsSource="{Binding Contacts}" x:Name="ContactsGrid">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="models:Contact">
-                                        <Border x:Name="RowBorder"
-                                                MinHeight="52"
-                                                Padding="16,8"
+                        <!-- Tab Content Template -->
+                        <TabControl.ContentTemplate>
+                            <DataTemplate x:DataType="vm:SessionTabViewModel">
+                                <Border Classes="card" Padding="0" ClipToBounds="True" Margin="0,12,0,0">
+                                    <Grid RowDefinitions="Auto,Auto,*">
+                                        
+                                        <!-- Session Info Bar (for history tabs) -->
+                                        <Border Grid.Row="0"
+                                                IsVisible="{Binding IsCurrentSession, Converter={StaticResource InverseBool}}"
+                                                Background="{StaticResource WarningLightBrush}"
+                                                Padding="12,8"
                                                 BorderBrush="{StaticResource BorderLightBrush}"
-                                                BorderThickness="0,0,0,1"
-                                                Background="Transparent">
-                                            <Border.Styles>
-                                                <Style Selector="Border#RowBorder">
-                                                    <Setter Property="Background" Value="Transparent"/>
-                                                    <Setter Property="Transitions">
-                                                        <Transitions>
-                                                            <BrushTransition Property="Background" Duration="0:0:0.12"/>
-                                                        </Transitions>
-                                                    </Setter>
-                                                </Style>
-                                                <Style Selector="Border#RowBorder:pointerover">
-                                                    <Setter Property="Background" Value="{StaticResource RowHoverBrush}"/>
-                                                </Style>
-                                            </Border.Styles>
-                                            
-                                            <Grid ColumnDefinitions="60,*,150,150,180,160" VerticalAlignment="Center">
-                                                <!-- ID -->
-                                                <TextBlock Grid.Column="0" 
-                                                           Classes="bodySecondary" 
-                                                           Text="{Binding Id}" 
-                                                           VerticalAlignment="Center"/>
-                                                
-                                                <!-- Name -->
-                                                <TextBlock Grid.Column="1" 
-                                                           Classes="body" 
-                                                           Text="{Binding Name}" 
-                                                           VerticalAlignment="Center"
-                                                           TextTrimming="CharacterEllipsis"/>
-                                                
-                                                <!-- Phone (Monospace) with Copy Button -->
-                                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                                    <TextBlock Classes="monospace" 
-                                                               Text="{Binding PhoneNumber}" 
-                                                               VerticalAlignment="Center"
-                                                               Foreground="{StaticResource TextSecondaryBrush}"/>
-                                                    <Button Classes="iconButton"
-                                                            Width="28" Height="28"
-                                                            Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).CopyPhoneNumberCommand}"
-                                                            CommandParameter="{Binding}"
-                                                            ToolTip.Tip="Sao chép số điện thoại">
-                                                        <TextBlock Text="📋" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                    </Button>
+                                                BorderThickness="0,0,0,1">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                                                    <TextBlock Text="📅" FontSize="14" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="Phiên đã lưu:" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding SessionKey}" 
+                                                               FontFamily="Consolas, Menlo, monospace"
+                                                               VerticalAlignment="Center"/>
+                                                    <TextBlock Text="•" VerticalAlignment="Center" Margin="8,0"/>
+                                                    <TextBlock Text="Chỉ xem (Read-only)" 
+                                                               FontStyle="Italic"
+                                                               Foreground="{StaticResource TextMutedBrush}"
+                                                               VerticalAlignment="Center"/>
                                                 </StackPanel>
                                                 
-                                                <!-- Company -->
-                                                <TextBlock Grid.Column="3" 
-                                                           Classes="bodySecondary" 
-                                                           Text="{Binding Company}" 
-                                                           VerticalAlignment="Center"
-                                                           TextTrimming="CharacterEllipsis"/>
-                                                
-                                                <!-- Status Badge -->
-                                                <Border Grid.Column="4"
-                                                        CornerRadius="9999"
-                                                        Padding="12,4"
-                                                        HorizontalAlignment="Left"
-                                                        VerticalAlignment="Center"
-                                                        Background="{Binding Status, Converter={StaticResource StatusToBackground}}">
-                                                    <TextBlock Text="{Binding Status, Converter={StaticResource StatusToString}}"
-                                                               FontSize="11"
-                                                               FontWeight="Medium"
-                                                               Foreground="{Binding Status, Converter={StaticResource StatusToForeground}}"/>
+                                                <!-- Delete Session Button -->
+                                                <Button Grid.Column="1"
+                                                        Classes="iconButton error"
+                                                        Width="28" Height="28"
+                                                        Command="{Binding $parent[TabControl].((vm:MainWindowViewModel)DataContext).RequestDeleteSessionCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip.Tip="Xóa phiên này khỏi database">
+                                                    <TextBlock Text="🗑️" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+                        
+                                        <!-- Table Header -->
+                                        <Border Grid.Row="1" 
+                                                Background="{StaticResource NeutralLightBrush}" 
+                                                Padding="16,12"
+                                                BorderBrush="{StaticResource BorderLightBrush}"
+                                                BorderThickness="0,0,0,1">
+                                            <Grid ColumnDefinitions="50,*,140,140,100,140,140,50">
+                                                <TextBlock Grid.Column="0" Classes="caption" FontWeight="SemiBold" Text="#"/>
+                                                <TextBlock Grid.Column="1" Classes="caption" FontWeight="SemiBold" Text="Tên"/>
+                                                <TextBlock Grid.Column="2" Classes="caption" FontWeight="SemiBold" Text="Số điện thoại"/>
+                                                <TextBlock Grid.Column="3" Classes="caption" FontWeight="SemiBold" Text="Công ty"/>
+                                                <TextBlock Grid.Column="4" Classes="caption" FontWeight="SemiBold" Text="Ghi chú"/>
+                                                <TextBlock Grid.Column="5" Classes="caption" FontWeight="SemiBold" Text="Trạng thái"/>
+                                                <TextBlock Grid.Column="6" Classes="caption" FontWeight="SemiBold" Text="Hành động" HorizontalAlignment="Center"/>
+                                                <TextBlock Grid.Column="7" Classes="caption" FontWeight="SemiBold" Text="" ToolTip.Tip="Double-click để chỉnh sửa"/>
+                                            </Grid>
+                                        </Border>
+                        
+                                        <!-- Table Content -->
+                                        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{Binding Contacts}" x:Name="ContactsGrid">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="models:Contact">
+                                                        <!-- Main Row Container -->
+                                                        <Border x:Name="RowContainer">
+                                                            <StackPanel>
+                                                                <!-- ════════════════════════════════════════════════════════════════ -->
+                                                                <!-- NORMAL VIEW MODE -->
+                                                                <!-- ════════════════════════════════════════════════════════════════ -->
+                                                                <Border x:Name="RowBorder"
+                                                                        Classes="contactRow"
+                                                                        IsVisible="{Binding IsEditing, Converter={StaticResource InverseBool}}"
+                                                                        DoubleTapped="OnRowDoubleTapped"
+                                                                        ToolTip.Tip="Double-click để chỉnh sửa">
+                                                    
+                                                                    <Grid ColumnDefinitions="50,*,140,140,100,140,140,50" VerticalAlignment="Center">
+                                                                        <!-- ID -->
+                                                        <TextBlock Grid.Column="0" 
+                                                                   Classes="bodySecondary" 
+                                                                   Text="{Binding Id}" 
+                                                                   VerticalAlignment="Center"/>
+                                                        
+                                                        <!-- Name -->
+                                                        <TextBlock Grid.Column="1" 
+                                                                   Classes="body" 
+                                                                   Text="{Binding Name}" 
+                                                                   VerticalAlignment="Center"
+                                                                   TextTrimming="CharacterEllipsis"/>
+                                                        
+                                                        <!-- Phone (Monospace) with Copy Button -->
+                                                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                                            <TextBlock Classes="monospace" 
+                                                                       Text="{Binding PhoneNumber}" 
+                                                                       VerticalAlignment="Center"
+                                                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                            <Button Classes="iconButton"
+                                                                    Width="24" Height="24"
+                                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CopyPhoneNumberCommand}"
+                                                                    CommandParameter="{Binding}"
+                                                                    ToolTip.Tip="Sao chép số điện thoại">
+                                                                <TextBlock Text="📋" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Button>
+                                                        </StackPanel>
+                                                        
+                                                        <!-- Company -->
+                                                        <TextBlock Grid.Column="3" 
+                                                                   Classes="bodySecondary" 
+                                                                   Text="{Binding Company}" 
+                                                                   VerticalAlignment="Center"
+                                                                   TextTrimming="CharacterEllipsis"/>
+                                                        
+                                                        <!-- Note Preview Button -->
+                                                        <Button Grid.Column="4"
+                                                                Classes="noteButton"
+                                                                Classes.hasNote="{Binding HasNote}"
+                                                                Command="{Binding ToggleNoteCommand}"
+                                                                VerticalAlignment="Center"
+                                                                ToolTip.Tip="Click để thêm/xem ghi chú">
+                                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                                <TextBlock Text="📝" FontSize="12" VerticalAlignment="Center"/>
+                                                                <!-- No note placeholder -->
+                                                                <TextBlock Text="Thêm..."
+                                                                           FontSize="11"
+                                                                           Foreground="{StaticResource TextMutedBrush}"
+                                                                           VerticalAlignment="Center"
+                                                                           IsVisible="{Binding HasNote, Converter={StaticResource InverseBool}}"/>
+                                                                <!-- Note preview -->
+                                                                <TextBlock Text="{Binding NotePreview}"
+                                                                           FontSize="11"
+                                                                           Foreground="{StaticResource WarningTextBrush}"
+                                                                           VerticalAlignment="Center"
+                                                                           MaxWidth="60"
+                                                                           TextTrimming="CharacterEllipsis"
+                                                                           IsVisible="{Binding HasNote}"/>
+                                                            </StackPanel>
+                                                        </Button>
+                                                        
+                                                        <!-- Status Badge -->
+                                                        <Border Grid.Column="5"
+                                                                CornerRadius="9999"
+                                                                Padding="10,4"
+                                                                HorizontalAlignment="Left"
+                                                                VerticalAlignment="Center"
+                                                                Background="{Binding Status, Converter={StaticResource StatusToBackground}}">
+                                                            <TextBlock Text="{Binding Status, Converter={StaticResource StatusToString}}"
+                                                                       FontSize="11"
+                                                                       FontWeight="Medium"
+                                                                       Foreground="{Binding Status, Converter={StaticResource StatusToForeground}}"/>
+                                                        </Border>
+                                                        
+                                                        <!-- Action Buttons -->
+                                                        <StackPanel Grid.Column="6" 
+                                                                    Orientation="Horizontal" 
+                                                                    Spacing="2" 
+                                                                    HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center">
+                                                            
+                                                            <!-- Answered Button -->
+                                                            <Button Classes="iconButton success"
+                                                                    Width="30" Height="30"
+                                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetAnsweredCommand}"
+                                                                    CommandParameter="{Binding}"
+                                                                    IsEnabled="{Binding IsActionsEnabled}"
+                                                                    ToolTip.Tip="Đánh dấu: Nghe máy">
+                                                                <TextBlock Text="📞" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Button>
+                                                            
+                                                            <!-- No Answer Button -->
+                                                            <Button Classes="iconButton neutral"
+                                                                    Width="30" Height="30"
+                                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetNoAnswerCommand}"
+                                                                    CommandParameter="{Binding}"
+                                                                    IsEnabled="{Binding IsActionsEnabled}"
+                                                                    ToolTip.Tip="Đánh dấu: Không nghe máy">
+                                                                <TextBlock Text="🔕" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Button>
+                                                            
+                                                            <!-- Invalid Number Button -->
+                                                            <Button Classes="iconButton error"
+                                                                    Width="30" Height="30"
+                                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetInvalidNumberCommand}"
+                                                                    CommandParameter="{Binding}"
+                                                                    IsEnabled="{Binding IsActionsEnabled}"
+                                                                    ToolTip.Tip="Đánh dấu: Số sai">
+                                                                <TextBlock Text="🚫" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Button>
+                                                            
+                                                            <!-- Busy Button -->
+                                                            <Button Classes="iconButton warning"
+                                                                    Width="30" Height="30"
+                                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetBusyCommand}"
+                                                                    CommandParameter="{Binding}"
+                                                                    IsEnabled="{Binding IsActionsEnabled}"
+                                                                    ToolTip.Tip="Đánh dấu: Máy bận">
+                                                                <TextBlock Text="⏳" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Button>
+                                                            
+                                                            <!-- Reset Button -->
+                                                            <Button Classes="iconButton"
+                                                                    Width="30" Height="30"
+                                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ResetStatusCommand}"
+                                                                    CommandParameter="{Binding}"
+                                                                    IsVisible="{Binding IsActionsEnabled, Converter={StaticResource InverseBool}}"
+                                                                    ToolTip.Tip="Đặt lại trạng thái">
+                                                                <TextBlock Text="↩️" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Button>
+                                                        </StackPanel>
+                                                        
+                                                        <!-- Edit Button -->
+                                                        <Button Grid.Column="7"
+                                                                Classes="iconButton"
+                                                                Width="30" Height="30"
+                                                                Command="{Binding EnterEditModeCommand}"
+                                                                ToolTip.Tip="Chỉnh sửa thông tin"
+                                                                VerticalAlignment="Center"
+                                                                HorizontalAlignment="Center">
+                                                            <TextBlock Text="✏️" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Button>
+                                                    </Grid>
                                                 </Border>
                                                 
-                                                <!-- Action Buttons -->
-                                                <StackPanel Grid.Column="5" 
-                                                            Orientation="Horizontal" 
-                                                            Spacing="4" 
-                                                            HorizontalAlignment="Center"
-                                                            VerticalAlignment="Center">
+                                                <!-- ════════════════════════════════════════════════════════════════ -->
+                                                <!-- EDIT MODE -->
+                                                <!-- ════════════════════════════════════════════════════════════════ -->
+                                                <Border x:Name="EditRowBorder"
+                                                        Classes="contactRow editing"
+                                                        IsVisible="{Binding IsEditing}"
+                                                        Padding="16,12">
                                                     
-                                                    <!-- Answered Button -->
-                                                    <Button Classes="iconButton success"
-                                                            Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).SetAnsweredCommand}"
-                                                            CommandParameter="{Binding}"
-                                                            IsEnabled="{Binding IsActionsEnabled}"
-                                                            ToolTip.Tip="Đánh dấu: Nghe máy">
-                                                        <TextBlock Text="📞" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                    </Button>
-                                                    
-                                                    <!-- No Answer Button -->
-                                                    <Button Classes="iconButton neutral"
-                                                            Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).SetNoAnswerCommand}"
-                                                            CommandParameter="{Binding}"
-                                                            IsEnabled="{Binding IsActionsEnabled}"
-                                                            ToolTip.Tip="Đánh dấu: Không nghe máy">
-                                                        <TextBlock Text="🔕" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                    </Button>
-                                                    
-                                                    <!-- Invalid Number Button -->
-                                                    <Button Classes="iconButton error"
-                                                            Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).SetInvalidNumberCommand}"
-                                                            CommandParameter="{Binding}"
-                                                            IsEnabled="{Binding IsActionsEnabled}"
-                                                            ToolTip.Tip="Đánh dấu: Số sai">
-                                                        <TextBlock Text="🚫" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                    </Button>
-                                                    
-                                                    <!-- Busy Button -->
-                                                    <Button Classes="iconButton warning"
-                                                            Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).SetBusyCommand}"
-                                                            CommandParameter="{Binding}"
-                                                            IsEnabled="{Binding IsActionsEnabled}"
-                                                            ToolTip.Tip="Đánh dấu: Máy bận">
-                                                        <TextBlock Text="⏳" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                    </Button>
-                                                    
-                                                    <!-- Reset Button (only shown when status is set) -->
-                                                    <Button Classes="iconButton"
-                                                            Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).ResetStatusCommand}"
-                                                            CommandParameter="{Binding}"
-                                                            IsVisible="{Binding IsActionsEnabled, Converter={StaticResource InverseBool}}"
-                                                            ToolTip.Tip="Đặt lại trạng thái">
-                                                        <TextBlock Text="↩️" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                    </Button>
-                                                </StackPanel>
-                                            </Grid>
+                                                    <StackPanel Spacing="12">
+                                                        <!-- Edit Fields Row -->
+                                                        <Grid ColumnDefinitions="50,*,140,140,100,140,140,50" VerticalAlignment="Center">
+                                                            <!-- ID (readonly) -->
+                                                            <TextBlock Grid.Column="0" 
+                                                                       Classes="bodySecondary" 
+                                                                       Text="{Binding Id}" 
+                                                                       VerticalAlignment="Center"/>
+                                                            
+                                                            <!-- Name Edit -->
+                                                            <TextBox Grid.Column="1" 
+                                                                     Classes="inlineEdit"
+                                                                     Text="{Binding EditName, Mode=TwoWay}"
+                                                                     Watermark="Tên liên hệ"
+                                                                     Margin="0,0,8,0"
+                                                                     VerticalAlignment="Center"/>
+                                                            
+                                                            <!-- Phone Edit -->
+                                                            <StackPanel Grid.Column="2" Margin="0,0,8,0">
+                                                                <TextBox Classes="inlineEdit phone"
+                                                                         Classes.error="{Binding HasPhoneError}"
+                                                                         Text="{Binding EditPhoneNumber, Mode=TwoWay}"
+                                                                         Watermark="Số điện thoại"
+                                                                         VerticalAlignment="Center"/>
+                                                                <TextBlock Classes="errorText"
+                                                                           Text="{Binding PhoneNumberError}"
+                                                                           IsVisible="{Binding HasPhoneError}"/>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Company Edit -->
+                                                            <TextBox Grid.Column="3" 
+                                                                     Classes="inlineEdit"
+                                                                     Text="{Binding EditCompany, Mode=TwoWay}"
+                                                                     Watermark="Công ty"
+                                                                     Margin="0,0,8,0"
+                                                                     VerticalAlignment="Center"/>
+                                                            
+                                                            <!-- Note Toggle Button -->
+                                                            <Button Grid.Column="4"
+                                                                    Classes="noteButton"
+                                                                    Classes.hasNote="{Binding HasNote}"
+                                                                    Command="{Binding ToggleNoteCommand}"
+                                                                    VerticalAlignment="Center"
+                                                                    ToolTip.Tip="Mở rộng/thu gọn ghi chú">
+                                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                                    <TextBlock Text="📝" FontSize="12" VerticalAlignment="Center"/>
+                                                                    <!-- Show "Thu gọn" when expanded, "Mở" when collapsed -->
+                                                                    <TextBlock Text="Thu gọn" FontSize="11" VerticalAlignment="Center"
+                                                                               IsVisible="{Binding IsNoteExpanded}"/>
+                                                                    <TextBlock Text="Mở" FontSize="11" VerticalAlignment="Center"
+                                                                               IsVisible="{Binding IsNoteExpanded, Converter={StaticResource InverseBool}}"/>
+                                                                </StackPanel>
+                                                            </Button>
+                                                            
+                                                            <!-- Status Badge (readonly in edit mode) -->
+                                                            <Border Grid.Column="5"
+                                                                    CornerRadius="9999"
+                                                                    Padding="10,4"
+                                                                    HorizontalAlignment="Left"
+                                                                    VerticalAlignment="Center"
+                                                                    Background="{Binding Status, Converter={StaticResource StatusToBackground}}"
+                                                                    Opacity="0.6">
+                                                                <TextBlock Text="{Binding Status, Converter={StaticResource StatusToString}}"
+                                                                           FontSize="11"
+                                                                           FontWeight="Medium"
+                                                                           Foreground="{Binding Status, Converter={StaticResource StatusToForeground}}"/>
+                                                            </Border>
+                                                            
+                                                            <!-- Save/Cancel Buttons -->
+                                                            <StackPanel Grid.Column="6" 
+                                                                        Orientation="Horizontal" 
+                                                                        Spacing="6"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center">
+                                                                <Button Classes="editActionSave"
+                                                                        Command="{Binding SaveEditCommand}"
+                                                                        IsEnabled="{Binding CanSave}"
+                                                                        ToolTip.Tip="Lưu thay đổi">
+                                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                                        <TextBlock Text="💾" FontSize="11" VerticalAlignment="Center"/>
+                                                                        <TextBlock Text="Lưu" VerticalAlignment="Center"/>
+                                                                    </StackPanel>
+                                                                </Button>
+                                                                <Button Classes="editActionCancel"
+                                                                        Command="{Binding CancelEditCommand}"
+                                                                        ToolTip.Tip="Hủy thay đổi (Esc)">
+                                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                                        <TextBlock Text="❌" FontSize="11" VerticalAlignment="Center"/>
+                                                                        <TextBlock Text="Hủy" VerticalAlignment="Center"/>
+                                                                    </StackPanel>
+                                                                </Button>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Empty column for alignment -->
+                                                            <Border Grid.Column="7"/>
+                                                        </Grid>
+                                                        
+                                                        <!-- ════════════════════════════════════════════════════════════════ -->
+                                                        <!-- EXPANDABLE NOTE PANEL -->
+                                                        <!-- ════════════════════════════════════════════════════════════════ -->
+                                                        <Border Classes="noteExpandPanel"
+                                                                IsVisible="{Binding IsNoteExpanded}"
+                                                                Margin="-16,0,-16,-12">
+                                                            <StackPanel Spacing="8">
+                                                                <TextBlock Text="📝 Ghi chú cuộc gọi" 
+                                                                           FontWeight="SemiBold" 
+                                                                           FontSize="12"
+                                                                           Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                                <TextBox Classes="noteTextArea"
+                                                                         Text="{Binding EditNote, Mode=TwoWay}"
+                                                                         x:Name="NoteTextBox"
+                                                                         KeyDown="OnNoteKeyDown"/>
+                                                                
+                                                                <!-- Quick Note Options -->
+                                                                <StackPanel Spacing="4">
+                                                                    <TextBlock Text="⚡ Ghi chú nhanh:" 
+                                                                               FontSize="11" 
+                                                                               Foreground="{StaticResource TextMutedBrush}"/>
+                                                                    <WrapPanel>
+                                                                        <Button Classes="quickNoteBtn"
+                                                                                Content="📞 Khách hẹn gọi lại"
+                                                                                Command="{Binding AddQuickNoteCommand}"
+                                                                                CommandParameter="Khách hẹn gọi lại sau"/>
+                                                                        <Button Classes="quickNoteBtn"
+                                                                                Content="⭐ Khách tiềm năng"
+                                                                                Command="{Binding AddQuickNoteCommand}"
+                                                                                CommandParameter="Khách hàng tiềm năng"/>
+                                                                        <Button Classes="quickNoteBtn"
+                                                                                Content="❌ Không có nhu cầu"
+                                                                                Command="{Binding AddQuickNoteCommand}"
+                                                                                CommandParameter="Không có nhu cầu"/>
+                                                                        <Button Classes="quickNoteBtn"
+                                                                                Content="📵 Sai số/Không liên lạc được"
+                                                                                Command="{Binding AddQuickNoteCommand}"
+                                                                                CommandParameter="Sai số / Không liên lạc được"/>
+                                                                        <Button Classes="quickNoteBtn"
+                                                                                Content="🤔 Cần tư vấn thêm"
+                                                                                Command="{Binding AddQuickNoteCommand}"
+                                                                                CommandParameter="Cần tư vấn thêm"/>
+                                                                        <Button Classes="quickNoteBtn"
+                                                                                Content="✅ Đã chốt đơn"
+                                                                                Command="{Binding AddQuickNoteCommand}"
+                                                                                CommandParameter="Đã chốt đơn"/>
+                                                                    </WrapPanel>
+                                                                </StackPanel>
+                                                                
+                                                                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                                                                    <TextBlock x:Name="NoteHintText"
+                                                                               Text="💡 ⌘+Enter (Mac) / Ctrl+Enter (Win) để lưu, Esc để hủy" 
+                                                                               FontSize="11" 
+                                                                               Foreground="{StaticResource TextMutedBrush}"
+                                                                               VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </StackPanel>
+                                                        </Border>
+                                                    </StackPanel>
+                                                </Border>
+                                            </StackPanel>
                                         </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </ScrollViewer>
-                    </Grid>
-                </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </TabControl.ContentTemplate>
+                    </TabControl>
+                </Grid>
+            </Border>
+        </Grid>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- DELETE CONFIRMATION DIALOG -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="0" Grid.RowSpan="2"
+              IsVisible="{Binding ShowDeleteConfirmation}"
+              ZIndex="200">
+            <Border Background="{StaticResource OverlayBackgroundBrush}"/>
+            <Border Background="{StaticResource CardBackgroundBrush}"
+                    CornerRadius="12"
+                    Padding="24"
+                    MaxWidth="400"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 25 50 -12 #40000000">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="🗑️ Xác nhận xóa" Classes="heading3" HorizontalAlignment="Center"/>
+                    <TextBlock Classes="bodySecondary" TextAlignment="Center" TextWrapping="Wrap">
+                        <Run Text="Bạn có chắc muốn xóa phiên này không?"/>
+                        <LineBreak/>
+                        <Run Text="Hành động này không thể hoàn tác." FontWeight="SemiBold"/>
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center" Margin="0,8,0,0">
+                        <Button Classes="secondary" 
+                                Content="Hủy" 
+                                Command="{Binding CancelDeleteSessionCommand}"
+                                Padding="20,8"/>
+                        <Button Classes="primary error" 
+                                Content="Xóa phiên" 
+                                Command="{Binding ConfirmDeleteSessionCommand}"
+                                Padding="20,8"/>
+                    </StackPanel>
+                </StackPanel>
             </Border>
         </Grid>
         
@@ -349,7 +775,8 @@
         <!-- ═══════════════════════════════════════════════════════════════════ -->
         <Grid Grid.Row="0" Grid.RowSpan="2" 
               IsVisible="{Binding ShowOnboarding}"
-              Classes="overlayFadeIn">
+              Classes="overlayFadeIn"
+              ZIndex="150">
             
             <!-- Dark Overlay -->
             <Border Background="{StaticResource OverlayBackgroundBrush}"/>

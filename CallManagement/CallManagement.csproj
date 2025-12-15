@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
+    <Folder Include="Services\" />
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
@@ -23,5 +24,9 @@
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+    <!-- SQLite for local database -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
+    <!-- Excel import/export -->
+    <PackageReference Include="ClosedXML" Version="0.104.2" />
   </ItemGroup>
 </Project>

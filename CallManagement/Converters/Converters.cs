@@ -36,6 +36,73 @@ namespace CallManagement.Converters
     }
 
     /// <summary>
+    /// Converts string to placeholder visibility (visible when empty).
+    /// </summary>
+    public class StringToPlaceholderVisibilityConverter : IValueConverter
+    {
+        public static readonly StringToPlaceholderVisibilityConverter Instance = new();
+
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is string str)
+            {
+                return string.IsNullOrWhiteSpace(str);
+            }
+            return true;
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Returns true if string has content (for note preview visibility).
+    /// </summary>
+    public class StringHasContentConverter : IValueConverter
+    {
+        public static readonly StringHasContentConverter Instance = new();
+
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is string str)
+            {
+                return !string.IsNullOrWhiteSpace(str);
+            }
+            return false;
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Converts bool to custom text values.
+    /// </summary>
+    public class BoolToTextConverter : IValueConverter
+    {
+        public string TrueText { get; set; } = "True";
+        public string FalseText { get; set; } = "False";
+
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                return boolValue ? TrueText : FalseText;
+            }
+            return FalseText;
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
     /// Converts CallStatus to badge CSS class name.
     /// </summary>
     public class CallStatusToBadgeClassConverter : IValueConverter
@@ -237,6 +304,52 @@ namespace CallManagement.Converters
                     : new SolidColorBrush(Color.Parse("#F9FAFB"));
             }
             return new SolidColorBrush(Color.Parse("#FFFFFF"));
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Converts bool to FontWeight (true = Bold, false = Normal).
+    /// </summary>
+    public class BoolToFontWeightConverter : IValueConverter
+    {
+        public static readonly BoolToFontWeightConverter Instance = new();
+
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                return boolValue ? Avalonia.Media.FontWeight.Bold : Avalonia.Media.FontWeight.Normal;
+            }
+            return Avalonia.Media.FontWeight.Normal;
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Converts bool to Brush (true = PrimaryBrush, false = TextSecondaryBrush).
+    /// </summary>
+    public class BoolToBrushConverter : IValueConverter
+    {
+        public static readonly BoolToBrushConverter Instance = new();
+
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                return boolValue 
+                    ? new SolidColorBrush(Color.Parse("#3B82F6"))  // PrimaryBrush
+                    : new SolidColorBrush(Color.Parse("#6B7280")); // TextSecondaryBrush
+            }
+            return new SolidColorBrush(Color.Parse("#6B7280"));
         }
 
         public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

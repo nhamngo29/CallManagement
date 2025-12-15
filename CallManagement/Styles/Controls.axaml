@@ -263,4 +263,390 @@
         <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusSM}"/>
     </Style>
     
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- INLINE EDITING - TEXT BOX STYLES -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="TextBox.inlineEdit">
+        <Setter Property="Background" Value="#FFFFFF"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderMediumBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMD}"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
+                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="TextBox.inlineEdit:focus">
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="Background" Value="#FFFFFF"/>
+    </Style>
+    
+    <Style Selector="TextBox.inlineEdit:pointerover">
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+    </Style>
+    
+    <Style Selector="TextBox.inlineEdit.error">
+        <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}"/>
+        <Setter Property="Background" Value="{StaticResource ErrorLightBrush}"/>
+    </Style>
+    
+    <!-- Phone Number TextBox (monospace) -->
+    <Style Selector="TextBox.inlineEdit.phone">
+        <Setter Property="FontFamily" Value="JetBrains Mono, Consolas, Menlo, Monaco, monospace"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- INLINE EDITING - NOTE TEXTAREA -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="TextBox.noteTextArea">
+        <Setter Property="Background" Value="#FFFFFF"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderMediumBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="12,10"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMD}"/>
+        <Setter Property="MinHeight" Value="80"/>
+        <Setter Property="MaxHeight" Value="160"/>
+        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="VerticalContentAlignment" Value="Top"/>
+        <Setter Property="Watermark" Value="Ghi chú cuộc gọi... (Ctrl+Enter để lưu, Esc để hủy)"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
+                <DoubleTransition Property="MinHeight" Duration="0:0:0.15" Easing="CubicEaseInOut"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="TextBox.noteTextArea:focus">
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- INLINE EDITING - NOTE PANEL -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Border.noteExpandPanel">
+        <Setter Property="Background" Value="#FAFBFC"/>
+        <Setter Property="CornerRadius" Value="0,0,8,8"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+        <Setter Property="Padding" Value="16,12"/>
+        <Setter Property="BoxShadow" Value="0 2 8 0 #10000000"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                <ThicknessTransition Property="Padding" Duration="0:0:0.15"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- INLINE EDITING - ROW STYLES -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Border.contactRow">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="MinHeight" Value="52"/>
+        <Setter Property="Padding" Value="16,8"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
+                <ThicknessTransition Property="BorderThickness" Duration="0:0:0.12"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Border.contactRow:pointerover">
+        <Setter Property="Background" Value="{StaticResource RowHoverBrush}"/>
+    </Style>
+    
+    <!-- Editing Row Style -->
+    <Style Selector="Border.contactRow.editing">
+        <Setter Property="Background" Value="#F0F7FF"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="3,0,0,1"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- INLINE EDITING - ACTION BUTTONS -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Button.editActionSave">
+        <Setter Property="Background" Value="{StaticResource SuccessLightBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource SuccessTextBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="MinHeight" Value="28"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Button.editActionSave:pointerover">
+        <Setter Property="Background" Value="#BBF7D0"/>
+    </Style>
+    
+    <Style Selector="Button.editActionSave:pressed">
+        <Setter Property="RenderTransform" Value="scaleX(0.96) scaleY(0.96)"/>
+    </Style>
+    
+    <Style Selector="Button.editActionSave:disabled">
+        <Setter Property="Opacity" Value="0.5"/>
+        <Setter Property="Cursor" Value="Arrow"/>
+    </Style>
+    
+    <Style Selector="Button.editActionCancel">
+        <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource NeutralTextBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="MinHeight" Value="28"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Button.editActionCancel:pointerover">
+        <Setter Property="Background" Value="#E5E7EB"/>
+    </Style>
+    
+    <Style Selector="Button.editActionCancel:pressed">
+        <Setter Property="RenderTransform" Value="scaleX(0.96) scaleY(0.96)"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- INLINE EDITING - NOTE BUTTON -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Button.noteButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="6,4"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="MinHeight" Value="24"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Button.noteButton:pointerover">
+        <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.noteButton.hasNote">
+        <Setter Property="Background" Value="{StaticResource WarningLightBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.noteButton.hasNote:pointerover">
+        <Setter Property="Background" Value="#FDE68A"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- INLINE EDITING - ERROR TEXT -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="TextBlock.errorText">
+        <Setter Property="Foreground" Value="{StaticResource ErrorTextBrush}"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="Margin" Value="0,4,0,0"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- SESSION TABS -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="TabControl.sessionTabs">
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    
+    <Style Selector="TabControl.sessionTabs TabItem">
+        <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="8,8,0,0"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="Margin" Value="0,0,4,0"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="TabControl.sessionTabs TabItem:pointerover">
+        <Setter Property="Background" Value="#E5E7EB"/>
+    </Style>
+    
+    <Style Selector="TabControl.sessionTabs TabItem:selected">
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+        <Setter Property="BorderThickness" Value="1,1,1,0"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- PRIMARY BUTTON WITH ERROR STYLE -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Button.primary.error">
+        <Setter Property="Background" Value="{StaticResource ErrorTextBrush}"/>
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+    
+    <Style Selector="Button.primary.error:pointerover">
+        <Setter Property="Background" Value="#B91C1C"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- QUICK NOTE BUTTON -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Button.quickNoteBtn">
+        <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource NeutralTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="Margin" Value="0,0,6,6"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Button.quickNoteBtn:pointerover">
+        <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.quickNoteBtn:pressed">
+        <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- SESSION LISTBOX -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="ListBox.sessionListBox">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    
+    <Style Selector="ListBox.sessionListBox ListBoxItem">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="0,2"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="ListBox.sessionListBox ListBoxItem:pointerover">
+        <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+    </Style>
+    
+    <Style Selector="ListBox.sessionListBox ListBoxItem:selected">
+        <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+    </Style>
+    
+    <Style Selector="ListBox.sessionListBox ListBoxItem:selected:pointerover">
+        <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
+    </Style>
+    
+    <!-- Text color changes for selected state -->
+    <Style Selector="ListBox.sessionListBox ListBoxItem:selected TextBlock">
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+    
+    <Style Selector="ListBox.sessionListBox ListBoxItem:selected Border">
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- SESSION LIST ITEM (BUTTON - LEGACY) -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Button.sessionListItem">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Padding" Value="12,10"/>
+        <Setter Property="Margin" Value="0,2"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Button.sessionListItem:pointerover">
+        <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.sessionListItem:pressed">
+        <Setter Property="Background" Value="{StaticResource BorderLightBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.sessionListItem.selected">
+        <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+    
+    <Style Selector="Button.sessionListItem.selected:pointerover">
+        <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
+    </Style>
+    
 </Styles>
