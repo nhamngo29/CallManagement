@@ -1,0 +1,85 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- TYPOGRAPHY STYLES -->
+    <!-- Font: Inter (with Segoe UI fallback) -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Styles.Resources>
+        <!-- Font Families -->
+        <FontFamily x:Key="DefaultFontFamily">Inter, Segoe UI, San Francisco, Helvetica Neue, Arial</FontFamily>
+        <FontFamily x:Key="MonospaceFontFamily">JetBrains Mono, Cascadia Code, Consolas, Courier New</FontFamily>
+        
+        <!-- Font Sizes -->
+        <x:Double x:Key="FontSizeXS">11</x:Double>
+        <x:Double x:Key="FontSizeSM">12</x:Double>
+        <x:Double x:Key="FontSizeMD">14</x:Double>
+        <x:Double x:Key="FontSizeLG">16</x:Double>
+        <x:Double x:Key="FontSizeXL">18</x:Double>
+        <x:Double x:Key="FontSize2XL">20</x:Double>
+        <x:Double x:Key="FontSize3XL">24</x:Double>
+        
+        <!-- Text Colors (duplicated for style access) -->
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1A1A2E"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#6B7280"/>
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#9CA3AF"/>
+    </Styles.Resources>
+    
+    <!-- Text Styles -->
+    <Style Selector="TextBlock.heading1">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSize3XL}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+    
+    <Style Selector="TextBlock.heading2">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSize2XL}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+    
+    <Style Selector="TextBlock.heading3">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeXL}"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+    
+    <Style Selector="TextBlock.body">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMD}"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+    
+    <Style Selector="TextBlock.bodySecondary">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMD}"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+    </Style>
+    
+    <Style Selector="TextBlock.caption">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeSM}"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+    </Style>
+    
+    <Style Selector="TextBlock.monospace">
+        <Setter Property="FontFamily" Value="{StaticResource MonospaceFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMD}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+    
+    <Style Selector="TextBlock.appTitle">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeLG}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+    
+</Styles>

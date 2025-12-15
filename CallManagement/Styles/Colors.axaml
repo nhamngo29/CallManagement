@@ -1,0 +1,99 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- THEME COLORS - Light Mode Default -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <!-- Background Colors -->
+    <Color x:Key="AppBackgroundColor">#F8F9FA</Color>
+    <Color x:Key="SidebarBackgroundColor">#FFFFFF</Color>
+    <Color x:Key="TopBarBackgroundColor">#FFFFFF</Color>
+    <Color x:Key="CardBackgroundColor">#FFFFFF</Color>
+    <Color x:Key="OverlayBackgroundColor">#000000</Color>
+    
+    <!-- Text Colors -->
+    <Color x:Key="TextPrimaryColor">#1A1A2E</Color>
+    <Color x:Key="TextSecondaryColor">#6B7280</Color>
+    <Color x:Key="TextMutedColor">#9CA3AF</Color>
+    <Color x:Key="TextOnPrimaryColor">#FFFFFF</Color>
+    
+    <!-- Brand Colors -->
+    <Color x:Key="PrimaryColor">#3B82F6</Color>
+    <Color x:Key="PrimaryHoverColor">#2563EB</Color>
+    <Color x:Key="PrimaryLightColor">#DBEAFE</Color>
+    
+    <!-- Status Colors - Soft/Muted versions (not neon) -->
+    <Color x:Key="SuccessColor">#22C55E</Color>
+    <Color x:Key="SuccessLightColor">#DCFCE7</Color>
+    <Color x:Key="SuccessTextColor">#166534</Color>
+    
+    <Color x:Key="WarningColor">#F59E0B</Color>
+    <Color x:Key="WarningLightColor">#FEF3C7</Color>
+    <Color x:Key="WarningTextColor">#92400E</Color>
+    
+    <Color x:Key="ErrorColor">#EF4444</Color>
+    <Color x:Key="ErrorLightColor">#FEE2E2</Color>
+    <Color x:Key="ErrorTextColor">#991B1B</Color>
+    
+    <Color x:Key="NeutralColor">#6B7280</Color>
+    <Color x:Key="NeutralLightColor">#F3F4F6</Color>
+    <Color x:Key="NeutralTextColor">#374151</Color>
+    
+    <!-- DataGrid Colors -->
+    <Color x:Key="RowAlternateColor">#F9FAFB</Color>
+    <Color x:Key="RowHoverColor">#F3F4F6</Color>
+    <Color x:Key="RowSelectedColor">#DBEAFE</Color>
+    <Color x:Key="RowSelectedBorderColor">#93C5FD</Color>
+    
+    <!-- Border Colors -->
+    <Color x:Key="BorderLightColor">#E5E7EB</Color>
+    <Color x:Key="BorderMediumColor">#D1D5DB</Color>
+    
+    <!-- Shadow Colors -->
+    <Color x:Key="ShadowColor">#1A000000</Color>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- SOLID COLOR BRUSHES -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <SolidColorBrush x:Key="AppBackgroundBrush" Color="{StaticResource AppBackgroundColor}"/>
+    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource SidebarBackgroundColor}"/>
+    <SolidColorBrush x:Key="TopBarBackgroundBrush" Color="{StaticResource TopBarBackgroundColor}"/>
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackgroundColor}"/>
+    <SolidColorBrush x:Key="OverlayBackgroundBrush" Color="{StaticResource OverlayBackgroundColor}" Opacity="0.6"/>
+    
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}"/>
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMutedColor}"/>
+    <SolidColorBrush x:Key="TextOnPrimaryBrush" Color="{StaticResource TextOnPrimaryColor}"/>
+    
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="PrimaryHoverBrush" Color="{StaticResource PrimaryHoverColor}"/>
+    <SolidColorBrush x:Key="PrimaryLightBrush" Color="{StaticResource PrimaryLightColor}"/>
+    
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
+    <SolidColorBrush x:Key="SuccessLightBrush" Color="{StaticResource SuccessLightColor}"/>
+    <SolidColorBrush x:Key="SuccessTextBrush" Color="{StaticResource SuccessTextColor}"/>
+    
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}"/>
+    <SolidColorBrush x:Key="WarningLightBrush" Color="{StaticResource WarningLightColor}"/>
+    <SolidColorBrush x:Key="WarningTextBrush" Color="{StaticResource WarningTextColor}"/>
+    
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}"/>
+    <SolidColorBrush x:Key="ErrorLightBrush" Color="{StaticResource ErrorLightColor}"/>
+    <SolidColorBrush x:Key="ErrorTextBrush" Color="{StaticResource ErrorTextColor}"/>
+    
+    <SolidColorBrush x:Key="NeutralBrush" Color="{StaticResource NeutralColor}"/>
+    <SolidColorBrush x:Key="NeutralLightBrush" Color="{StaticResource NeutralLightColor}"/>
+    <SolidColorBrush x:Key="NeutralTextBrush" Color="{StaticResource NeutralTextColor}"/>
+    
+    <SolidColorBrush x:Key="RowAlternateBrush" Color="{StaticResource RowAlternateColor}"/>
+    <SolidColorBrush x:Key="RowHoverBrush" Color="{StaticResource RowHoverColor}"/>
+    <SolidColorBrush x:Key="RowSelectedBrush" Color="{StaticResource RowSelectedColor}"/>
+    <SolidColorBrush x:Key="RowSelectedBorderBrush" Color="{StaticResource RowSelectedBorderColor}"/>
+    
+    <SolidColorBrush x:Key="BorderLightBrush" Color="{StaticResource BorderLightColor}"/>
+    <SolidColorBrush x:Key="BorderMediumBrush" Color="{StaticResource BorderMediumColor}"/>
+    
+</ResourceDictionary>

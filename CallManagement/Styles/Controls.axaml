@@ -1,0 +1,266 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- COMMON VALUES -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Styles.Resources>
+        <CornerRadius x:Key="CornerRadiusSM">4</CornerRadius>
+        <CornerRadius x:Key="CornerRadiusMD">8</CornerRadius>
+        <CornerRadius x:Key="CornerRadiusLG">12</CornerRadius>
+        <CornerRadius x:Key="CornerRadiusXL">16</CornerRadius>
+        <CornerRadius x:Key="CornerRadiusPill">9999</CornerRadius>
+        
+        <x:Double x:Key="RowMinHeight">44</x:Double>
+        <x:Double x:Key="ButtonMinHeight">36</x:Double>
+        <x:Double x:Key="IconButtonSize">36</x:Double>
+        
+        <Thickness x:Key="SpacingXS">4</Thickness>
+        <Thickness x:Key="SpacingSM">8</Thickness>
+        <Thickness x:Key="SpacingMD">12</Thickness>
+        <Thickness x:Key="SpacingLG">16</Thickness>
+        <Thickness x:Key="SpacingXL">24</Thickness>
+        
+        <!-- Fonts -->
+        <FontFamily x:Key="DefaultFontFamily">Inter, Segoe UI, San Francisco, Helvetica Neue, Arial</FontFamily>
+        <x:Double x:Key="FontSizeXS">11</x:Double>
+        <x:Double x:Key="FontSizeSM">12</x:Double>
+        <x:Double x:Key="FontSizeMD">14</x:Double>
+        
+        <!-- Colors needed for controls -->
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#3B82F6"/>
+        <SolidColorBrush x:Key="PrimaryHoverBrush" Color="#2563EB"/>
+        <SolidColorBrush x:Key="TextOnPrimaryBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1A1A2E"/>
+        <SolidColorBrush x:Key="BorderMediumBrush" Color="#D1D5DB"/>
+        <SolidColorBrush x:Key="BorderLightBrush" Color="#E5E7EB"/>
+        <SolidColorBrush x:Key="NeutralLightBrush" Color="#F3F4F6"/>
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="SuccessLightBrush" Color="#DCFCE7"/>
+        <SolidColorBrush x:Key="SuccessTextBrush" Color="#166534"/>
+        <SolidColorBrush x:Key="WarningLightBrush" Color="#FEF3C7"/>
+        <SolidColorBrush x:Key="WarningTextBrush" Color="#92400E"/>
+        <SolidColorBrush x:Key="ErrorLightBrush" Color="#FEE2E2"/>
+        <SolidColorBrush x:Key="ErrorTextBrush" Color="#991B1B"/>
+        <SolidColorBrush x:Key="NeutralTextBrush" Color="#374151"/>
+    </Styles.Resources>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- PRIMARY BUTTON -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Button.primary">
+        <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextOnPrimaryBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMD}"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Padding" Value="16,10"/>
+        <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusMD}"/>
+        <Setter Property="MinHeight" Value="{StaticResource ButtonMinHeight}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="RenderTransform" Value="scaleX(1) scaleY(1)"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15"/>
+                <BrushTransition Property="Background" Duration="0:0:0.15"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Button.primary:pointerover">
+        <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
+        <Setter Property="RenderTransform" Value="scaleX(1.02) scaleY(1.02)"/>
+    </Style>
+    
+    <Style Selector="Button.primary:pressed">
+        <Setter Property="RenderTransform" Value="scaleX(0.98) scaleY(0.98)"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- SECONDARY BUTTON -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Button.secondary">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderMediumBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMD}"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Padding" Value="16,10"/>
+        <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusMD}"/>
+        <Setter Property="MinHeight" Value="{StaticResource ButtonMinHeight}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="RenderTransform" Value="scaleX(1) scaleY(1)"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15"/>
+                <BrushTransition Property="Background" Duration="0:0:0.15"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Button.secondary:pointerover">
+        <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+        <Setter Property="RenderTransform" Value="scaleX(1.02) scaleY(1.02)"/>
+    </Style>
+    
+    <Style Selector="Button.secondary:pressed">
+        <Setter Property="RenderTransform" Value="scaleX(0.98) scaleY(0.98)"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- ICON BUTTON (Circle) -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Button.iconButton">
+        <Setter Property="Width" Value="{StaticResource IconButtonSize}"/>
+        <Setter Property="Height" Value="{StaticResource IconButtonSize}"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusPill}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="RenderTransform" Value="scaleX(1) scaleY(1)"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12"/>
+                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Button.iconButton:pointerover">
+        <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+        <Setter Property="RenderTransform" Value="scaleX(1.08) scaleY(1.08)"/>
+    </Style>
+    
+    <Style Selector="Button.iconButton:pressed">
+        <Setter Property="RenderTransform" Value="scaleX(0.92) scaleY(0.92)"/>
+    </Style>
+    
+    <Style Selector="Button.iconButton:disabled">
+        <Setter Property="Opacity" Value="0.4"/>
+        <Setter Property="Cursor" Value="Arrow"/>
+    </Style>
+    
+    <!-- Icon Button Variants -->
+    <Style Selector="Button.iconButton.success:pointerover">
+        <Setter Property="Background" Value="{StaticResource SuccessLightBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.iconButton.warning:pointerover">
+        <Setter Property="Background" Value="{StaticResource WarningLightBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.iconButton.error:pointerover">
+        <Setter Property="Background" Value="{StaticResource ErrorLightBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.iconButton.neutral:pointerover">
+        <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- TOPBAR BUTTON (Icon + Text) -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Button.topBarButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMD}"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusMD}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="RenderTransform" Value="scaleX(1) scaleY(1)"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12"/>
+                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Button.topBarButton:pointerover">
+        <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+        <Setter Property="RenderTransform" Value="scaleX(1.02) scaleY(1.02)"/>
+    </Style>
+    
+    <Style Selector="Button.topBarButton:pressed">
+        <Setter Property="RenderTransform" Value="scaleX(0.98) scaleY(0.98)"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- STATUS BADGE -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Border.statusBadge">
+        <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusPill}"/>
+        <Setter Property="Padding" Value="10,4"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+    </Style>
+    
+    <Style Selector="Border.statusBadge TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeXS}"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+    </Style>
+    
+    <Style Selector="Border.statusBadge.success">
+        <Setter Property="Background" Value="{StaticResource SuccessLightBrush}"/>
+    </Style>
+    <Style Selector="Border.statusBadge.success TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource SuccessTextBrush}"/>
+    </Style>
+    
+    <Style Selector="Border.statusBadge.warning">
+        <Setter Property="Background" Value="{StaticResource WarningLightBrush}"/>
+    </Style>
+    <Style Selector="Border.statusBadge.warning TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource WarningTextBrush}"/>
+    </Style>
+    
+    <Style Selector="Border.statusBadge.error">
+        <Setter Property="Background" Value="{StaticResource ErrorLightBrush}"/>
+    </Style>
+    <Style Selector="Border.statusBadge.error TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource ErrorTextBrush}"/>
+    </Style>
+    
+    <Style Selector="Border.statusBadge.neutral">
+        <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+    </Style>
+    <Style Selector="Border.statusBadge.neutral TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource NeutralTextBrush}"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- CARD -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusLG}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="16"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- TOOLTIP -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="ToolTip">
+        <Setter Property="Background" Value="#1F2937"/>
+        <Setter Property="Foreground" Value="#FFFFFF"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeSM}"/>
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusSM}"/>
+    </Style>
+    
+</Styles>

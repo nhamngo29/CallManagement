@@ -1,0 +1,28 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- ANIMATION STYLES -->
+    <!-- All animations are < 250ms for smooth, non-fancy feel -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <!-- Page Load Fade In Animation -->
+    <Style Selector="Panel.fadeIn">
+        <Setter Property="Opacity" Value="1"/>
+    </Style>
+    
+    <Style Selector="Border.fadeIn">
+        <Setter Property="Opacity" Value="1"/>
+    </Style>
+    
+    <!-- Overlay Fade In -->
+    <Style Selector="Grid.overlayFadeIn">
+        <Setter Property="Opacity" Value="1"/>
+    </Style>
+    
+    <!-- Content Scale In -->
+    <Style Selector="Border.scaleIn">
+        <Setter Property="Opacity" Value="1"/>
+    </Style>
+    
+</Styles>
