@@ -357,4 +357,48 @@ namespace CallManagement.Converters
             throw new NotImplementedException();
         }
     }
+
+    /// <summary>
+    /// Converts bool to opacity (true = 1.0, false = 0.5).
+    /// </summary>
+    public class BoolToOpacityConverter : IValueConverter
+    {
+        public static readonly BoolToOpacityConverter Instance = new();
+
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                return boolValue ? 1.0 : 0.5;
+            }
+            return 0.5;
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Converts bool to save button text ("Đang lưu..." / "Save Settings").
+    /// </summary>
+    public class BoolToSavingTextConverter : IValueConverter
+    {
+        public static readonly BoolToSavingTextConverter Instance = new();
+
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is bool isSaving)
+            {
+                return isSaving ? "Đang lưu..." : "Save Settings";
+            }
+            return "Save Settings";
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

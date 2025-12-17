@@ -127,5 +127,27 @@ namespace CallManagement.Views
                 }
             }
         }
+
+        /// <summary>
+        /// Handle click on settings overlay background to close settings panel.
+        /// </summary>
+        private void SettingsOverlay_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (DataContext is MainWindowViewModel viewModel)
+            {
+                viewModel.CloseSettingsCommand.Execute(null);
+            }
+        }
+
+        /// <summary>
+        /// Handle click on send report overlay background to close popup.
+        /// </summary>
+        private void SendReportOverlay_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (DataContext is MainWindowViewModel viewModel)
+            {
+                viewModel.CloseSendReportCommand.Execute(null);
+            }
+        }
     }
 }

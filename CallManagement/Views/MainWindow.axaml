@@ -3,6 +3,7 @@
         xmlns:vm="using:CallManagement.ViewModels"
         xmlns:models="using:CallManagement.Models"
         xmlns:conv="using:CallManagement.Converters"
+        xmlns:local="using:CallManagement.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
@@ -32,6 +33,8 @@
         <conv:StringToPlaceholderVisibilityConverter x:Key="StringToPlaceholder"/>
         <conv:BoolToFontWeightConverter x:Key="BoolToFontWeightConverter"/>
         <conv:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
+        <conv:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
+        <conv:BoolToSavingTextConverter x:Key="BoolToSavingTextConverter"/>
     </Window.Resources>
 
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -83,6 +86,25 @@
                         </StackPanel>
                     </Button>
                     
+                    <!-- Send Report Button -->
+                    <Button Classes="topBarButton"
+                            x:Name="SendReportButton"
+                            Command="{Binding OpenSendReportCommand}"
+                            IsEnabled="{Binding IsTelegramConfigured}">
+                        <Button.Styles>
+                            <Style Selector="Button:disabled">
+                                <Setter Property="ToolTip.Tip" Value="Configure Telegram Bot in Settings first"/>
+                            </Style>
+                            <Style Selector="Button:enabled">
+                                <Setter Property="ToolTip.Tip" Value="Gửi báo cáo Excel qua Telegram"/>
+                            </Style>
+                        </Button.Styles>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="📨" FontSize="16"/>
+                            <TextBlock Text="Send Report" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    
                     <!-- Separator -->
                     <Border Width="1" Height="24" Background="{StaticResource BorderLightBrush}" Margin="8,0"/>
                     
@@ -116,6 +138,13 @@
                             Command="{Binding ShowHelpCommand}"
                             ToolTip.Tip="Xem hướng dẫn sử dụng">
                         <TextBlock Text="❓" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    
+                    <!-- Settings Button -->
+                    <Button Classes="iconButton"
+                            Command="{Binding OpenSettingsCommand}"
+                            ToolTip.Tip="Cài đặt (Settings)">
+                        <TextBlock Text="⚙️" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                 </StackPanel>
             </Grid>
@@ -895,6 +924,325 @@
                             Foreground="{StaticResource TextMutedBrush}"/>
                 </StackPanel>
             </Border>
+        </Grid>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- SETTINGS PANEL OVERLAY -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="0" Grid.RowSpan="2"
+              IsVisible="{Binding ShowSettings}"
+              ZIndex="200">
+            
+            <!-- Background Overlay -->
+            <Border Background="{StaticResource OverlayBackgroundBrush}"
+                    PointerPressed="SettingsOverlay_PointerPressed"/>
+            
+            <!-- Settings Panel -->
+            <Border Background="{StaticResource CardBackgroundBrush}"
+                    Width="520"
+                    MaxHeight="700"
+                    CornerRadius="16"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 8 32 0 #40000000">
+                
+                <Grid RowDefinitions="Auto,*">
+                    
+                    <!-- Header with close button -->
+                    <Border Grid.Row="0"
+                            BorderBrush="{StaticResource BorderLightBrush}"
+                            BorderThickness="0,0,0,1"
+                            Padding="20,16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="heading2" Text="⚙️ Settings" VerticalAlignment="Center"/>
+                            <Button Grid.Column="1"
+                                    Classes="iconButton"
+                                    Command="{Binding CloseSettingsCommand}"
+                                    ToolTip.Tip="Đóng Settings">
+                                <TextBlock Text="✕" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Settings Content -->
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  Padding="20">
+                        
+                        <StackPanel Spacing="20" DataContext="{Binding SettingsViewModel}">
+                            
+                            <!-- ═══════════════════════════════════════════════ -->
+                            <!-- SECURITY SECTION -->
+                            <!-- ═══════════════════════════════════════════════ -->
+                            <Border Background="{StaticResource AppBackgroundBrush}"
+                                    CornerRadius="12"
+                                    Padding="16">
+                                <StackPanel Spacing="12">
+                                    
+                                    <!-- Section Header -->
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Text="🔐" FontSize="18"/>
+                                        <TextBlock Classes="heading3" Text="Security" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    
+                                    <Border Height="1" Background="{StaticResource BorderLightBrush}"/>
+                                    
+                                    <!-- Unlocked State -->
+                                    <StackPanel IsVisible="{Binding IsUnlocked}" Spacing="10">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Text="✔️" FontSize="14" Foreground="{StaticResource SuccessTextBrush}"/>
+                                            <TextBlock Text="Settings unlocked" 
+                                                       Classes="body"
+                                                       Foreground="{StaticResource SuccessTextBrush}"
+                                                       FontWeight="Medium"/>
+                                        </StackPanel>
+                                        
+                                        <Button Classes="secondary"
+                                                Command="{Binding LockCommand}"
+                                                HorizontalAlignment="Left"
+                                                Padding="12,8">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="🔒" FontSize="12"/>
+                                                <TextBlock Text="Lock Settings"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                    
+                                    <!-- Locked State -->
+                                    <StackPanel IsVisible="{Binding !IsUnlocked}" Spacing="10">
+                                        <TextBlock Classes="bodySecondary" 
+                                                   Text="Nhập mật khẩu để truy cập cài đặt"/>
+                                        
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBox Grid.Column="0"
+                                                     PasswordChar="●"
+                                                     Text="{Binding PasswordInput, Mode=TwoWay}"
+                                                     Watermark="Mật khẩu"
+                                                     Margin="0,0,10,0"/>
+                                            <Button Grid.Column="1"
+                                                    Classes="primary"
+                                                    Command="{Binding UnlockCommand}"
+                                                    Padding="16,8">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <TextBlock Text="🔓" FontSize="12"/>
+                                                    <TextBlock Text="Unlock"/>
+                                                </StackPanel>
+                                            </Button>
+                                        </Grid>
+                                        
+                                        <!-- Password Error -->
+                                        <Border IsVisible="{Binding ShowPasswordError}"
+                                                Background="{StaticResource ErrorLightBrush}"
+                                                CornerRadius="6"
+                                                Padding="10,8">
+                                            <TextBlock Text="{Binding PasswordError}"
+                                                       Foreground="{StaticResource ErrorTextBrush}"
+                                                       FontSize="12"/>
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- ═══════════════════════════════════════════════ -->
+                            <!-- TELEGRAM BOT SECTION -->
+                            <!-- ═══════════════════════════════════════════════ -->
+                            <Border Background="{StaticResource AppBackgroundBrush}"
+                                    CornerRadius="12"
+                                    Padding="16"
+                                    IsEnabled="{Binding IsUnlocked}">
+                                <Border.Opacity>
+                                    <Binding Path="IsUnlocked">
+                                        <Binding.Converter>
+                                            <conv:BoolToOpacityConverter/>
+                                        </Binding.Converter>
+                                    </Binding>
+                                </Border.Opacity>
+                                
+                                <StackPanel Spacing="12">
+                                    
+                                    <!-- Section Header -->
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Text="🤖" FontSize="18"/>
+                                        <TextBlock Classes="heading3" Text="Telegram Bot" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    
+                                    <Border Height="1" Background="{StaticResource BorderLightBrush}"/>
+                                    
+                                    <!-- Locked Message -->
+                                    <Border IsVisible="{Binding !IsUnlocked}"
+                                            Background="{StaticResource WarningLightBrush}"
+                                            CornerRadius="6"
+                                            Padding="10,8">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Text="🔒" FontSize="12"/>
+                                            <TextBlock Text="Unlock để truy cập cài đặt này"
+                                                       Foreground="{StaticResource WarningTextBrush}"
+                                                       FontSize="12"/>
+                                        </StackPanel>
+                                    </Border>
+                                    
+                                    <!-- Telegram Form -->
+                                    <StackPanel IsVisible="{Binding IsUnlocked}" Spacing="14">
+                                        
+                                        <!-- Bot Token -->
+                                        <StackPanel Spacing="4">
+                                            <TextBlock Classes="body" Text="Bot Token" FontWeight="Medium"/>
+                                            <TextBox Text="{Binding TelegramBotToken, Mode=TwoWay}"
+                                                     Watermark="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"/>
+                                            <TextBlock IsVisible="{Binding ShowBotTokenError}"
+                                                       Text="{Binding BotTokenError}"
+                                                       Foreground="{StaticResource ErrorTextBrush}"
+                                                       FontSize="11"/>
+                                        </StackPanel>
+                                        
+                                        <!-- Chat ID -->
+                                        <StackPanel Spacing="4">
+                                            <TextBlock Classes="body" Text="Chat ID" FontWeight="Medium"/>
+                                            <TextBox Text="{Binding TelegramChatId, Mode=TwoWay}"
+                                                     Watermark="-1001234567890"/>
+                                            <TextBlock IsVisible="{Binding ShowChatIdError}"
+                                                       Text="{Binding ChatIdError}"
+                                                       Foreground="{StaticResource ErrorTextBrush}"
+                                                       FontSize="11"/>
+                                        </StackPanel>
+                                        
+                                        <!-- Help Info -->
+                                        <Border Background="{StaticResource NeutralLightBrush}"
+                                                CornerRadius="6"
+                                                Padding="10,8">
+                                            <StackPanel Spacing="2">
+                                                <TextBlock Classes="caption" FontWeight="SemiBold" Text="💡 Hướng dẫn"/>
+                                                <TextBlock Classes="caption" 
+                                                           TextWrapping="Wrap"
+                                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                                           FontSize="11"
+                                                           LineHeight="16">
+                                                    <Run Text="1. Tạo bot tại @BotFather"/>
+                                                    <LineBreak/>
+                                                    <Run Text="2. Copy Bot Token"/>
+                                                    <LineBreak/>
+                                                    <Run Text="3. Lấy Chat ID từ @userinfobot"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Border>
+                                        
+                                        <!-- Action Buttons -->
+                                        <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,6,0,0">
+                                            <Button Grid.Column="1"
+                                                    Classes="secondary"
+                                                    Command="{Binding ClearSensitiveDataCommand}"
+                                                    Margin="0,0,10,0"
+                                                    Padding="12,8"
+                                                    ToolTip.Tip="Xóa toàn bộ cài đặt Telegram">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <TextBlock Text="🗑️" FontSize="12"/>
+                                                    <TextBlock Text="Xóa"/>
+                                                </StackPanel>
+                                            </Button>
+                                            
+                                            <Button Grid.Column="2"
+                                                    Classes="primary"
+                                                    Command="{Binding SaveSettingsCommand}"
+                                                    IsEnabled="{Binding !IsSaving}"
+                                                    Padding="16,8">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <TextBlock Text="💾" FontSize="12"/>
+                                                    <TextBlock>
+                                                        <TextBlock.Text>
+                                                            <Binding Path="IsSaving">
+                                                                <Binding.Converter>
+                                                                    <conv:BoolToSavingTextConverter/>
+                                                                </Binding.Converter>
+                                                            </Binding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </Button>
+                                        </Grid>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- Status Message -->
+                            <Border IsVisible="{Binding ShowStatusMessage}"
+                                    CornerRadius="8"
+                                    Padding="12">
+                                <Panel>
+                                    <!-- Success -->
+                                    <Border IsVisible="{Binding IsStatusSuccess}"
+                                            Background="{StaticResource SuccessLightBrush}"
+                                            CornerRadius="8"
+                                            Margin="-12"
+                                            Padding="12">
+                                        <TextBlock Text="{Binding StatusMessage}"
+                                                   Foreground="{StaticResource SuccessTextBrush}"
+                                                   FontWeight="Medium"
+                                                   FontSize="12"/>
+                                    </Border>
+                                    <!-- Error -->
+                                    <Border IsVisible="{Binding !IsStatusSuccess}"
+                                            Background="{StaticResource ErrorLightBrush}"
+                                            CornerRadius="8"
+                                            Margin="-12"
+                                            Padding="12">
+                                        <TextBlock Text="{Binding StatusMessage}"
+                                                   Foreground="{StaticResource ErrorTextBrush}"
+                                                   FontWeight="Medium"
+                                                   FontSize="12"/>
+                                    </Border>
+                                </Panel>
+                            </Border>
+                            
+                            <!-- Security Info -->
+                            <Border Background="{StaticResource NeutralLightBrush}"
+                                    CornerRadius="8"
+                                    Padding="12">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Classes="caption" 
+                                               FontWeight="SemiBold" 
+                                               Text="🛡️ Thông tin bảo mật"/>
+                                    <TextBlock Classes="caption" 
+                                               TextWrapping="Wrap"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               FontSize="11"
+                                               LineHeight="16">
+                                        <Run Text="• Mật khẩu SHA-256, không lưu plain text"/>
+                                        <LineBreak/>
+                                        <Run Text="• Cài đặt lưu cục bộ trên máy"/>
+                                        <LineBreak/>
+                                        <Run Text="• Khởi động lại app cần unlock lại"/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+                            
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- SEND REPORT POPUP OVERLAY -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="0" Grid.RowSpan="2"
+              IsVisible="{Binding ShowSendReport}"
+              ZIndex="300">
+            
+            <!-- Background Overlay -->
+            <Border Background="{StaticResource OverlayBackgroundBrush}"
+                    PointerPressed="SendReportOverlay_PointerPressed"/>
+            
+            <!-- Send Report Panel -->
+            <ContentControl Content="{Binding SendReportViewModel}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                <ContentControl.ContentTemplate>
+                    <DataTemplate DataType="vm:SendReportViewModel">
+                        <local:SendReportView DataContext="{Binding}"/>
+                    </DataTemplate>
+                </ContentControl.ContentTemplate>
+            </ContentControl>
         </Grid>
     </Grid>
 </Window>

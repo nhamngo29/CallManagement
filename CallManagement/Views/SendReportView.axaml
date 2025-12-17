@@ -1,0 +1,332 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CallManagement.ViewModels"
+             xmlns:conv="using:CallManagement.Converters"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
+             x:Class="CallManagement.Views.SendReportView"
+             x:DataType="vm:SendReportViewModel">
+    
+    <Design.DataContext>
+        <vm:SendReportViewModel/>
+    </Design.DataContext>
+    
+    <UserControl.Resources>
+        <conv:BoolToOpacityConverter x:Key="BoolToOpacity"/>
+        <conv:InverseBoolConverter x:Key="InverseBool"/>
+    </UserControl.Resources>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- MAIN POPUP CONTAINER -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <Border Background="{StaticResource CardBackgroundBrush}"
+            CornerRadius="16"
+            BoxShadow="0 8 32 0 #33000000"
+            MinWidth="450"
+            MaxWidth="550"
+            MaxHeight="650"
+            Padding="0">
+        
+        <Grid RowDefinitions="Auto,*,Auto">
+            
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- HEADER -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <Border Grid.Row="0"
+                    Background="{StaticResource PrimaryBrush}"
+                    CornerRadius="16,16,0,0"
+                    Padding="20,16">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="📤 Send Report"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="White"/>
+                        <TextBlock Text="Gửi báo cáo Excel qua Telegram"
+                                   FontSize="12"
+                                   Foreground="#FFFFFFCC"/>
+                    </StackPanel>
+                    
+                    <Button Grid.Column="1"
+                            Classes="iconButton"
+                            Command="{Binding CloseCommand}"
+                            Background="Transparent"
+                            Width="32" Height="32"
+                            ToolTip.Tip="Đóng (ESC)">
+                        <TextBlock Text="✕" FontSize="16" Foreground="White" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                </Grid>
+            </Border>
+            
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- CONTENT -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <ScrollViewer Grid.Row="1" 
+                          VerticalScrollBarVisibility="Auto"
+                          Padding="20">
+                <StackPanel Spacing="20"
+                            IsEnabled="{Binding !IsSending}">
+                    
+                    <!-- ─────────────────────────────────────────────────────── -->
+                    <!-- FILTER SECTION -->
+                    <!-- ─────────────────────────────────────────────────────── -->
+                    <Border Background="{StaticResource NeutralLightBrush}"
+                            CornerRadius="12"
+                            Padding="16">
+                        <StackPanel Spacing="12">
+                            <TextBlock Classes="heading4" Text="🔍 Filter"/>
+                            
+                            <!-- Today Filter -->
+                            <CheckBox IsChecked="{Binding FilterToday}"
+                                      Content="Hôm nay"
+                                      FontWeight="Medium"/>
+                            
+                            <!-- Date Range Filter -->
+                            <CheckBox IsChecked="{Binding FilterDateRange}"
+                                      Content="Chọn khoảng ngày"/>
+                            
+                            <!-- Date Pickers -->
+                            <Grid ColumnDefinitions="Auto,*,Auto,*"
+                                  IsVisible="{Binding FilterDateRange}"
+                                  Margin="24,8,0,0">
+                                <TextBlock Grid.Column="0" 
+                                           Text="Từ:" 
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0"/>
+                                <DatePicker Grid.Column="1"
+                                            SelectedDate="{Binding FilterFromDate}"
+                                            MinWidth="130"/>
+                                
+                                <TextBlock Grid.Column="2" 
+                                           Text="Đến:" 
+                                           VerticalAlignment="Center"
+                                           Margin="16,0,8,0"/>
+                                <DatePicker Grid.Column="3"
+                                            SelectedDate="{Binding FilterToDate}"
+                                            MinWidth="130"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- ─────────────────────────────────────────────────────── -->
+                    <!-- SESSIONS SECTION -->
+                    <!-- ─────────────────────────────────────────────────────── -->
+                    <Border Background="{StaticResource CardBackgroundBrush}"
+                            BorderBrush="{StaticResource BorderLightBrush}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="16">
+                        <StackPanel Spacing="12">
+                            
+                            <!-- Header with Select All -->
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Classes="heading4" Text="📂 Sessions"/>
+                                    <Border Background="{StaticResource PrimaryLightBrush}"
+                                            CornerRadius="10"
+                                            Padding="8,2">
+                                        <TextBlock Text="{Binding FilteredSessions.Count}"
+                                                   FontSize="11"
+                                                   Foreground="{StaticResource PrimaryBrush}"
+                                                   FontWeight="SemiBold"/>
+                                    </Border>
+                                </StackPanel>
+                                
+                                <CheckBox Grid.Column="1"
+                                          IsChecked="{Binding SelectAll}"
+                                          Content="Chọn tất cả"
+                                          FontSize="12"/>
+                            </Grid>
+                            
+                            <!-- Sessions List -->
+                            <Border Height="200"
+                                    Background="{StaticResource NeutralLightBrush}"
+                                    CornerRadius="8"
+                                    BorderBrush="{StaticResource BorderLightBrush}"
+                                    BorderThickness="1">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <ItemsControl ItemsSource="{Binding FilteredSessions}"
+                                                  Margin="8">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:SelectableSessionViewModel">
+                                                <Border Background="White"
+                                                        CornerRadius="6"
+                                                        Margin="0,2"
+                                                        Padding="12,8"
+                                                        Cursor="Hand">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                                        <CheckBox Grid.Column="0"
+                                                                  IsChecked="{Binding IsSelected}"
+                                                                  VerticalAlignment="Center"
+                                                                  Margin="0,0,8,0"/>
+                                                        
+                                                        <TextBlock Grid.Column="1"
+                                                                   Text="{Binding DisplayText}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontWeight="Medium"/>
+                                                        
+                                                        <Border Grid.Column="2"
+                                                                Background="{StaticResource NeutralLightBrush}"
+                                                                CornerRadius="8"
+                                                                Padding="6,2">
+                                                            <TextBlock FontSize="11"
+                                                                       Foreground="{StaticResource TextMutedBrush}">
+                                                                <TextBlock.Text>
+                                                                    <MultiBinding StringFormat="{}{0} contacts">
+                                                                        <Binding Path="ContactCount"/>
+                                                                    </MultiBinding>
+                                                                </TextBlock.Text>
+                                                            </TextBlock>
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Border>
+                            
+                            <!-- Empty State -->
+                            <Border IsVisible="{Binding !FilteredSessions.Count}"
+                                    Background="{StaticResource WarningLightBrush}"
+                                    CornerRadius="8"
+                                    Padding="12">
+                                <TextBlock Text="Không có session nào phù hợp với filter"
+                                           Foreground="{StaticResource WarningTextBrush}"
+                                           HorizontalAlignment="Center"
+                                           FontSize="13"/>
+                            </Border>
+                            
+                            <!-- Selection Summary -->
+                            <TextBlock FontSize="12"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       HorizontalAlignment="Right">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="Đã chọn: {0} session(s)">
+                                        <Binding Path="SelectedCount"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- ─────────────────────────────────────────────────────── -->
+                    <!-- RESULT MESSAGE -->
+                    <!-- ─────────────────────────────────────────────────────── -->
+                    <Border IsVisible="{Binding ShowResult}"
+                            CornerRadius="8"
+                            Padding="12">
+                        <Border.Styles>
+                            <Style Selector="Border.success">
+                                <Setter Property="Background" Value="{StaticResource SuccessLightBrush}"/>
+                            </Style>
+                            <Style Selector="Border.error">
+                                <Setter Property="Background" Value="{StaticResource ErrorLightBrush}"/>
+                            </Style>
+                        </Border.Styles>
+                        
+                        <Panel>
+                            <!-- Success -->
+                            <StackPanel IsVisible="{Binding IsResultSuccess}" Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="✔️" FontSize="14"/>
+                                    <TextBlock Text="{Binding ResultMessage}"
+                                               Foreground="{StaticResource SuccessTextBrush}"
+                                               FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </StackPanel>
+                            
+                            <!-- Error -->
+                            <StackPanel IsVisible="{Binding !IsResultSuccess}" Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="❌" FontSize="14"/>
+                                    <TextBlock Text="{Binding ResultMessage}"
+                                               Foreground="{StaticResource ErrorTextBrush}"
+                                               FontWeight="SemiBold"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding ErrorDetails}"
+                                           Foreground="{StaticResource ErrorTextBrush}"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           IsVisible="{Binding ErrorDetails, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                           Margin="26,4,0,0"/>
+                            </StackPanel>
+                        </Panel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+            
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- PROGRESS OVERLAY (over content) -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <Border Grid.Row="1"
+                    IsVisible="{Binding IsSending}"
+                    Background="#F0FFFFFF"
+                    CornerRadius="0">
+                <StackPanel VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Spacing="16">
+                    <ProgressBar IsIndeterminate="False"
+                                 Minimum="0"
+                                 Maximum="{Binding ProgressTotal}"
+                                 Value="{Binding ProgressCurrent}"
+                                 Width="200"
+                                 Height="8"/>
+                    <TextBlock Text="{Binding SendingProgress}"
+                               HorizontalAlignment="Center"
+                               FontWeight="Medium"/>
+                    <Button Classes="secondary"
+                            Content="Hủy"
+                            Command="{Binding CancelCommand}"
+                            HorizontalAlignment="Center"
+                            MinWidth="80"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- FOOTER BUTTONS -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <Border Grid.Row="2"
+                    BorderBrush="{StaticResource BorderLightBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="20,16">
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                    <!-- File info -->
+                    <TextBlock Grid.Column="0"
+                               FontSize="12"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               VerticalAlignment="Center">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="Sẽ gửi {0} file Excel">
+                                <Binding Path="SelectedCount"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    
+                    <!-- Cancel Button -->
+                    <Button Grid.Column="1"
+                            Classes="secondary"
+                            Content="Cancel"
+                            Command="{Binding CancelCommand}"
+                            IsEnabled="{Binding !IsSending}"
+                            MinWidth="90"
+                            Margin="0,0,12,0"/>
+                    
+                    <!-- Send Button -->
+                    <Button Grid.Column="2"
+                            Classes="primary"
+                            Command="{Binding SendCommand}"
+                            IsEnabled="{Binding HasSelectedSessions}"
+                            MinWidth="110">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="📤" FontSize="14"/>
+                            <TextBlock Text="Send"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

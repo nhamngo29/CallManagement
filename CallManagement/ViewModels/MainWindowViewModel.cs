@@ -75,6 +75,29 @@ namespace CallManagement.ViewModels
         [ObservableProperty]
         private SessionTabViewModel? _sessionToDelete;
 
+        // ═══════════════════════════════════════════════════════════════════════
+        // SETTINGS VIEW
+        // ═══════════════════════════════════════════════════════════════════════
+
+        [ObservableProperty]
+        private bool _showSettings;
+
+        [ObservableProperty]
+        private SettingsViewModel? _settingsViewModel;
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // SEND REPORT VIEW
+        // ═══════════════════════════════════════════════════════════════════════
+
+        [ObservableProperty]
+        private bool _showSendReport;
+
+        [ObservableProperty]
+        private SendReportViewModel? _sendReportViewModel;
+
+        [ObservableProperty]
+        private bool _isTelegramConfigured;
+
         public int TotalCount => SelectedTab?.TotalCount ?? 0;
         public int AnsweredCount => SelectedTab?.AnsweredCount ?? 0;
         public int NoAnswerCount => SelectedTab?.NoAnswerCount ?? 0;
@@ -103,6 +126,10 @@ namespace CallManagement.ViewModels
                 _databaseService = new DatabaseService();
                 await _databaseService.InitializeAsync();
 
+                // Initialize settings service for Telegram check
+                var settingsService = new SettingsService();
+                await settingsService.InitializeAsync();
+
                 // Create current session tab
                 var currentTab = new SessionTabViewModel();
                 Tabs.Add(currentTab);
@@ -121,6 +148,9 @@ namespace CallManagement.ViewModels
                 LoadSampleData();
 
                 CheckFirstLaunch();
+
+                // Check Telegram configuration
+                await CheckTelegramConfigurationAsync();
 
                 StatusMessage = "San sang";
             }
@@ -778,6 +808,84 @@ namespace CallManagement.ViewModels
         private void ShowHelp()
         {
             StartOnboarding();
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // SETTINGS COMMANDS
+        // ═══════════════════════════════════════════════════════════════════════
+
+        [RelayCommand]
+        private async Task OpenSettings()
+        {
+            if (SettingsViewModel == null)
+            {
+                SettingsViewModel = new SettingsViewModel();
+                
+                // Initialize settings service
+                var settingsService = new SettingsService();
+                await SettingsViewModel.InitializeAsync();
+            }
+            
+            ShowSettings = true;
+        }
+
+        [RelayCommand]
+        private void CloseSettings()
+        {
+            ShowSettings = false;
+            
+            // Lock settings when closing (security requirement)
+            if (SettingsViewModel != null)
+            {
+                SettingsViewModel.IsUnlocked = false;
+            }
+            
+            // Check Telegram configuration after closing settings
+            _ = CheckTelegramConfigurationAsync();
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // SEND REPORT COMMANDS
+        // ═══════════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Check if Telegram is configured and update the button state.
+        /// </summary>
+        public async Task CheckTelegramConfigurationAsync()
+        {
+            if (_databaseService == null) return;
+
+            try
+            {
+                var telegramService = new TelegramReportService(_databaseService);
+                IsTelegramConfigured = await telegramService.IsConfiguredAsync();
+            }
+            catch
+            {
+                IsTelegramConfigured = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task OpenSendReport()
+        {
+            if (_databaseService == null) return;
+
+            // Initialize SendReportViewModel
+            SendReportViewModel = new SendReportViewModel();
+            SendReportViewModel.RequestClose += () =>
+            {
+                ShowSendReport = false;
+            };
+
+            await SendReportViewModel.InitializeAsync(_databaseService);
+            ShowSendReport = true;
+        }
+
+        [RelayCommand]
+        private void CloseSendReport()
+        {
+            ShowSendReport = false;
         }
 
         private void CheckFirstLaunch()
