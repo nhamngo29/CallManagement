@@ -5,6 +5,31 @@
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    
+    <!-- App Info -->
+    <AssemblyName>CallManagement</AssemblyName>
+    <!-- <ApplicationIcon>Assets\app-icon.ico</ApplicationIcon> -->
+    <Version>1.0.0</Version>
+    <Authors>Your Company</Authors>
+    <Product>Call Management</Product>
+    <Description>Ứng dụng quản lý cuộc gọi</Description>
+  </PropertyGroup>
+
+  <!-- Release publish settings -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
+  <!-- macOS specific settings -->
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <CFBundleName>CallManagement</CFBundleName>
+    <CFBundleDisplayName>Call Management</CFBundleDisplayName>
+    <CFBundleIdentifier>com.yourcompany.callmanagement</CFBundleIdentifier>
+    <CFBundleVersion>1.0.0</CFBundleVersion>
+    <CFBundleShortVersionString>1.0</CFBundleShortVersionString>
   </PropertyGroup>
 
   <ItemGroup>
