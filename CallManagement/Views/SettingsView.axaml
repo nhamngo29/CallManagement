@@ -20,62 +20,66 @@
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!-- MAIN SETTINGS CONTAINER -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <ScrollViewer VerticalScrollBarVisibility="Auto"
-                  HorizontalScrollBarVisibility="Disabled">
-        <StackPanel Spacing="24" Margin="32">
-            
-            <!-- ═══════════════════════════════════════════════════════════════ -->
-            <!-- HEADER -->
-            <!-- ═══════════════════════════════════════════════════════════════ -->
-            <StackPanel Spacing="4">
-                <TextBlock Classes="heading2" Text="⚙️ Settings"/>
-                <TextBlock Classes="bodySecondary" 
-                           Text="Quản lý giao diện, bảo mật và Telegram Bot"/>
-            </StackPanel>
-            
-            <!-- ═══════════════════════════════════════════════════════════════ -->
-            <!-- STATUS MESSAGE -->
-            <!-- ═══════════════════════════════════════════════════════════════ -->
-            <Border IsVisible="{Binding ShowStatusMessage}"
-                    CornerRadius="8"
-                    Padding="12">
-                <Border.Background>
-                    <MultiBinding Converter="{x:Static BoolConverters.Or}">
-                        <Binding Path="IsStatusSuccess"/>
-                    </MultiBinding>
-                </Border.Background>
-                <Border.Styles>
-                    <Style Selector="Border[Tag=success]">
-                        <Setter Property="Background" Value="{DynamicResource SuccessLightBrush}"/>
-                    </Style>
-                </Border.Styles>
-                <Panel>
-                    <!-- Success Background -->
-                    <Border IsVisible="{Binding IsStatusSuccess}"
-                            Background="{DynamicResource SuccessLightBrush}"
-                            CornerRadius="8"
-                            Margin="-12"
-                            Padding="12">
+    <Grid RowDefinitions="Auto,*">
+        
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- STATUS MESSAGE (Always visible at top) -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <Border Grid.Row="0"
+                IsVisible="{Binding ShowStatusMessage}"
+                CornerRadius="0"
+                Padding="32,12"
+                MaxHeight="80">
+            <Panel>
+                <!-- Success Background -->
+                <Border IsVisible="{Binding IsStatusSuccess}"
+                        Background="{DynamicResource SuccessLightBrush}"
+                        CornerRadius="8"
+                        Padding="12">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="✔️" FontSize="14"/>
                         <TextBlock Text="{Binding StatusMessage}"
                                    Foreground="{DynamicResource SuccessTextBrush}"
-                                   FontWeight="Medium"/>
-                    </Border>
-                    <!-- Error Background -->
-                    <Border IsVisible="{Binding !IsStatusSuccess}"
-                            Background="{DynamicResource ErrorLightBrush}"
-                            CornerRadius="8"
-                            Margin="-12"
-                            Padding="12">
+                                   FontWeight="Medium"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                <!-- Error Background -->
+                <Border IsVisible="{Binding !IsStatusSuccess}"
+                        Background="{DynamicResource ErrorLightBrush}"
+                        CornerRadius="8"
+                        Padding="12">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="❌" FontSize="14"/>
                         <TextBlock Text="{Binding StatusMessage}"
                                    Foreground="{DynamicResource ErrorTextBrush}"
-                                   FontWeight="Medium"/>
-                    </Border>
-                </Panel>
-            </Border>
+                                   FontWeight="Medium"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </Panel>
+        </Border>
+        
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SCROLLABLE CONTENT -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Spacing="24" Margin="32">
+                
+                <!-- ═══════════════════════════════════════════════════════════════ -->
+                <!-- HEADER -->
+                <!-- ═══════════════════════════════════════════════════════════════ -->
+                <StackPanel Spacing="4">
+                    <TextBlock Classes="heading2" Text="⚙️ Settings"/>
+                    <TextBlock Classes="bodySecondary" 
+                               Text="Quản lý giao diện, bảo mật và Telegram Bot"/>
+                </StackPanel>
             
-            <!-- ═══════════════════════════════════════════════════════════════ -->
-            <!-- APPEARANCE SECTION (Theme) -->
-            <!-- ═══════════════════════════════════════════════════════════════ -->
+                <!-- ═══════════════════════════════════════════════════════════════ -->
+                <!-- APPEARANCE SECTION (Theme) -->
+                <!-- ═══════════════════════════════════════════════════════════════ -->
             <Border Classes="card" Padding="20" CornerRadius="12">
                 <StackPanel Spacing="16">
                     
@@ -418,6 +422,7 @@
                 </StackPanel>
             </Border>
             
-        </StackPanel>
-    </ScrollViewer>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
 </UserControl>
