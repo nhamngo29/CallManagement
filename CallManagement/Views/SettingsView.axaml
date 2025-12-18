@@ -87,27 +87,17 @@
                     
                     <Border Height="1" Background="{DynamicResource BorderLightBrush}" Margin="0,4"/>
                     
-                    <!-- Theme Selection -->
+                    <!-- Theme Selection (Coming Soon) -->
                     <Grid ColumnDefinitions="*,Auto">
                         <StackPanel Grid.Column="0" Spacing="4">
                             <TextBlock Classes="body" Text="Theme" FontWeight="Medium"/>
                             <TextBlock Classes="caption" Text="Chọn giao diện sáng, tối hoặc theo hệ thống" 
                                        Foreground="{DynamicResource TextSecondaryBrush}"/>
                         </StackPanel>
-                        <ComboBox Grid.Column="1"
-                                  Width="180"
-                                  ItemsSource="{Binding ThemeModeOptions}"
-                                  SelectedValue="{Binding SelectedThemeMode}"
-                                  SelectedValueBinding="{Binding Mode}"
-                                  HorizontalAlignment="Right">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
+                        <TextBlock Grid.Column="1"
+                                   Text="Light (Default)"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
                     </Grid>
                     
                     <!-- Theme Info -->

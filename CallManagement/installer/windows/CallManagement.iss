@@ -44,7 +44,7 @@ WizardSizePercent=110
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 ; Misc
-SetupIconFile=..\..\Assets\app-icon.ico
+SetupIconFile=..\..\Assets\AppIcon.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 UninstallDisplayName={#MyAppName}
 VersionInfoVersion={#MyAppVersion}
