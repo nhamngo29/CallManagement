@@ -19,10 +19,11 @@ namespace CallManagement.Converters
             {
                 return status switch
                 {
-                    CallStatus.Answered => "Nghe máy",
-                    CallStatus.NoAnswer => "Không nghe",
-                    CallStatus.InvalidNumber => "Số sai",
+                    CallStatus.Interested => "Có nhu cầu",
+                    CallStatus.NotInterested => "Không nhu cầu",
+                    CallStatus.NoAnswer => "Không bắt máy",
                     CallStatus.Busy => "Máy bận",
+                    CallStatus.InvalidNumber => "Số không tồn tại",
                     _ => "Chưa gọi"
                 };
             }
@@ -115,10 +116,11 @@ namespace CallManagement.Converters
             {
                 return status switch
                 {
-                    CallStatus.Answered => "success",
+                    CallStatus.Interested => "success",
+                    CallStatus.NotInterested => "error",
                     CallStatus.NoAnswer => "neutral",
-                    CallStatus.InvalidNumber => "error",
                     CallStatus.Busy => "warning",
+                    CallStatus.InvalidNumber => "error-dark",
                     _ => "neutral"
                 };
             }
@@ -144,10 +146,11 @@ namespace CallManagement.Converters
             {
                 return status switch
                 {
-                    CallStatus.Answered => new SolidColorBrush(Color.Parse("#DCFCE7")),
-                    CallStatus.NoAnswer => new SolidColorBrush(Color.Parse("#F3F4F6")),
-                    CallStatus.InvalidNumber => new SolidColorBrush(Color.Parse("#FEE2E2")),
-                    CallStatus.Busy => new SolidColorBrush(Color.Parse("#FEF3C7")),
+                    CallStatus.Interested => new SolidColorBrush(Color.Parse("#DCFCE7")),      // Xanh lá nhạt
+                    CallStatus.NotInterested => new SolidColorBrush(Color.Parse("#FEE2E2")),  // Đỏ nhạt
+                    CallStatus.NoAnswer => new SolidColorBrush(Color.Parse("#F3F4F6")),       // Xám
+                    CallStatus.Busy => new SolidColorBrush(Color.Parse("#FEF3C7")),           // Vàng
+                    CallStatus.InvalidNumber => new SolidColorBrush(Color.Parse("#7F1D1D")), // Đỏ đậm
                     _ => new SolidColorBrush(Color.Parse("#F3F4F6"))
                 };
             }
@@ -173,10 +176,11 @@ namespace CallManagement.Converters
             {
                 return status switch
                 {
-                    CallStatus.Answered => new SolidColorBrush(Color.Parse("#166534")),
-                    CallStatus.NoAnswer => new SolidColorBrush(Color.Parse("#374151")),
-                    CallStatus.InvalidNumber => new SolidColorBrush(Color.Parse("#991B1B")),
-                    CallStatus.Busy => new SolidColorBrush(Color.Parse("#92400E")),
+                    CallStatus.Interested => new SolidColorBrush(Color.Parse("#166534")),      // Xanh đậm
+                    CallStatus.NotInterested => new SolidColorBrush(Color.Parse("#991B1B")),  // Đỏ đậm
+                    CallStatus.NoAnswer => new SolidColorBrush(Color.Parse("#374151")),       // Xám đậm
+                    CallStatus.Busy => new SolidColorBrush(Color.Parse("#92400E")),           // Vàng đậm
+                    CallStatus.InvalidNumber => new SolidColorBrush(Color.Parse("#FFFFFF")), // Trắng (trên nền đỏ đậm)
                     _ => new SolidColorBrush(Color.Parse("#374151"))
                 };
             }
@@ -394,6 +398,120 @@ namespace CallManagement.Converters
                 return isSaving ? "Đang lưu..." : "Save Settings";
             }
             return "Save Settings";
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Converts string to bool (true if string has content).
+    /// Used for showing/hiding clear button in search box.
+    /// </summary>
+    public class StringNotEmptyConverter : IValueConverter
+    {
+        public static readonly StringNotEmptyConverter Instance = new();
+
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is string str)
+            {
+                return !string.IsNullOrEmpty(str);
+            }
+            return false;
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // NOTIFICATION CONVERTERS
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Converts NotificationType to background brush for toast.
+    /// </summary>
+    public class NotificationTypeToBackgroundConverter : IValueConverter
+    {
+        public static readonly NotificationTypeToBackgroundConverter Instance = new();
+
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is NotificationType type)
+            {
+                return type switch
+                {
+                    NotificationType.Success => new SolidColorBrush(Color.Parse("#DCFCE7")), // Green light
+                    NotificationType.Info => new SolidColorBrush(Color.Parse("#DBEAFE")),    // Blue light
+                    NotificationType.Warning => new SolidColorBrush(Color.Parse("#FEF3C7")), // Orange light
+                    NotificationType.Error => new SolidColorBrush(Color.Parse("#FEE2E2")),   // Red light
+                    _ => new SolidColorBrush(Color.Parse("#F3F4F6"))
+                };
+            }
+            return new SolidColorBrush(Color.Parse("#F3F4F6"));
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Converts NotificationType to foreground brush for toast text/icon.
+    /// </summary>
+    public class NotificationTypeToForegroundConverter : IValueConverter
+    {
+        public static readonly NotificationTypeToForegroundConverter Instance = new();
+
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is NotificationType type)
+            {
+                return type switch
+                {
+                    NotificationType.Success => new SolidColorBrush(Color.Parse("#166534")), // Green dark
+                    NotificationType.Info => new SolidColorBrush(Color.Parse("#1E40AF")),    // Blue dark
+                    NotificationType.Warning => new SolidColorBrush(Color.Parse("#92400E")), // Orange dark
+                    NotificationType.Error => new SolidColorBrush(Color.Parse("#991B1B")),   // Red dark
+                    _ => new SolidColorBrush(Color.Parse("#374151"))
+                };
+            }
+            return new SolidColorBrush(Color.Parse("#374151"));
+        }
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Converts NotificationType to icon background brush (slightly darker than toast background).
+    /// </summary>
+    public class NotificationTypeToIconBackgroundConverter : IValueConverter
+    {
+        public static readonly NotificationTypeToIconBackgroundConverter Instance = new();
+
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is NotificationType type)
+            {
+                return type switch
+                {
+                    NotificationType.Success => new SolidColorBrush(Color.Parse("#BBF7D0")), // Green medium
+                    NotificationType.Info => new SolidColorBrush(Color.Parse("#BFDBFE")),    // Blue medium
+                    NotificationType.Warning => new SolidColorBrush(Color.Parse("#FDE68A")), // Orange medium
+                    NotificationType.Error => new SolidColorBrush(Color.Parse("#FECACA")),   // Red medium
+                    _ => new SolidColorBrush(Color.Parse("#E5E7EB"))
+                };
+            }
+            return new SolidColorBrush(Color.Parse("#E5E7EB"));
         }
 
         public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

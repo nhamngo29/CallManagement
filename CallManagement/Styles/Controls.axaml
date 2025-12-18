@@ -16,11 +16,21 @@
         <x:Double x:Key="ButtonMinHeight">36</x:Double>
         <x:Double x:Key="IconButtonSize">36</x:Double>
         
+        <!-- Standard control height for consistency -->
+        <x:Double x:Key="ControlHeight">36</x:Double>
+        
+        <!-- Animation durations -->
+        <x:String x:Key="HoverDuration">0:0:0.15</x:String>
+        <x:String x:Key="FocusDuration">0:0:0.12</x:String>
+        
         <Thickness x:Key="SpacingXS">4</Thickness>
         <Thickness x:Key="SpacingSM">8</Thickness>
         <Thickness x:Key="SpacingMD">12</Thickness>
         <Thickness x:Key="SpacingLG">16</Thickness>
         <Thickness x:Key="SpacingXL">24</Thickness>
+        
+        <!-- Focus ring thickness -->
+        <x:Double x:Key="FocusBorderThickness">2</x:Double>
         
         <!-- Fonts -->
         <FontFamily x:Key="DefaultFontFamily">Inter, Segoe UI, San Francisco, Helvetica Neue, Arial</FontFamily>
@@ -31,20 +41,36 @@
         <!-- Colors needed for controls -->
         <SolidColorBrush x:Key="PrimaryBrush" Color="#3B82F6"/>
         <SolidColorBrush x:Key="PrimaryHoverBrush" Color="#2563EB"/>
+        <SolidColorBrush x:Key="PrimaryFocusBrush" Color="#3B82F6"/>
         <SolidColorBrush x:Key="TextOnPrimaryBrush" Color="#FFFFFF"/>
         <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1A1A2E"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#6B7280"/>
         <SolidColorBrush x:Key="BorderMediumBrush" Color="#D1D5DB"/>
         <SolidColorBrush x:Key="BorderLightBrush" Color="#E5E7EB"/>
         <SolidColorBrush x:Key="NeutralLightBrush" Color="#F3F4F6"/>
+        <SolidColorBrush x:Key="HoverBackgroundBrush" Color="#F9FAFB"/>
         <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="SuccessBrush" Color="#22C55E"/>
         <SolidColorBrush x:Key="SuccessLightBrush" Color="#DCFCE7"/>
         <SolidColorBrush x:Key="SuccessTextBrush" Color="#166534"/>
+        <SolidColorBrush x:Key="WarningBrush" Color="#F59E0B"/>
         <SolidColorBrush x:Key="WarningLightBrush" Color="#FEF3C7"/>
         <SolidColorBrush x:Key="WarningTextBrush" Color="#92400E"/>
+        <SolidColorBrush x:Key="ErrorBrush" Color="#EF4444"/>
         <SolidColorBrush x:Key="ErrorLightBrush" Color="#FEE2E2"/>
         <SolidColorBrush x:Key="ErrorTextBrush" Color="#991B1B"/>
         <SolidColorBrush x:Key="NeutralTextBrush" Color="#374151"/>
+        <SolidColorBrush x:Key="RowHoverBrush" Color="#F3F4F6"/>
     </Styles.Resources>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- GLOBAL FOCUS VISIBLE OUTLINE (Keyboard accessibility) -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Button:focus-visible">
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
     
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!-- PRIMARY BUTTON -->
@@ -59,12 +85,15 @@
         <Setter Property="Padding" Value="16,10"/>
         <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusMD}"/>
         <Setter Property="MinHeight" Value="{StaticResource ButtonMinHeight}"/>
+        <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="RenderTransform" Value="scaleX(1) scaleY(1)"/>
         <Setter Property="Transitions">
             <Transitions>
-                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15"/>
-                <BrushTransition Property="Background" Duration="0:0:0.15"/>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <BrushTransition Property="Background" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
+                <ThicknessTransition Property="BorderThickness" Duration="0:0:0.12"/>
             </Transitions>
         </Setter>
     </Style>
@@ -76,6 +105,16 @@
     
     <Style Selector="Button.primary:pressed">
         <Setter Property="RenderTransform" Value="scaleX(0.98) scaleY(0.98)"/>
+    </Style>
+    
+    <Style Selector="Button.primary:focus-visible">
+        <Setter Property="BorderBrush" Value="#FFFFFF"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+    
+    <Style Selector="Button.primary:disabled">
+        <Setter Property="Opacity" Value="0.5"/>
+        <Setter Property="Cursor" Value="Arrow"/>
     </Style>
     
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -97,19 +136,31 @@
         <Setter Property="RenderTransform" Value="scaleX(1) scaleY(1)"/>
         <Setter Property="Transitions">
             <Transitions>
-                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15"/>
-                <BrushTransition Property="Background" Duration="0:0:0.15"/>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <BrushTransition Property="Background" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
             </Transitions>
         </Setter>
     </Style>
     
     <Style Selector="Button.secondary:pointerover">
         <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderMediumBrush}"/>
         <Setter Property="RenderTransform" Value="scaleX(1.02) scaleY(1.02)"/>
     </Style>
     
     <Style Selector="Button.secondary:pressed">
         <Setter Property="RenderTransform" Value="scaleX(0.98) scaleY(0.98)"/>
+    </Style>
+    
+    <Style Selector="Button.secondary:focus-visible">
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+    
+    <Style Selector="Button.secondary:disabled">
+        <Setter Property="Opacity" Value="0.5"/>
+        <Setter Property="Cursor" Value="Arrow"/>
     </Style>
     
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -121,13 +172,16 @@
         <Setter Property="Height" Value="{StaticResource IconButtonSize}"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="2"/>
         <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusPill}"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="RenderTransform" Value="scaleX(1) scaleY(1)"/>
         <Setter Property="Transitions">
             <Transitions>
-                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12"/>
-                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <BrushTransition Property="Background" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
             </Transitions>
         </Setter>
     </Style>
@@ -139,6 +193,10 @@
     
     <Style Selector="Button.iconButton:pressed">
         <Setter Property="RenderTransform" Value="scaleX(0.92) scaleY(0.92)"/>
+    </Style>
+    
+    <Style Selector="Button.iconButton:focus-visible">
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
     </Style>
     
     <Style Selector="Button.iconButton:disabled">
@@ -164,12 +222,93 @@
     </Style>
     
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- ACTION ICON BUTTON (For status actions - larger hit area, cleaner look) -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Button.actionIconButton">
+        <Setter Property="Width" Value="34"/>
+        <Setter Property="Height" Value="34"/>
+        <Setter Property="MinWidth" Value="34"/>
+        <Setter Property="MinHeight" Value="34"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="1"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="RenderTransform" Value="scaleX(1) scaleY(1)"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12" Easing="CubicEaseOut"/>
+                <BrushTransition Property="Background" Duration="0:0:0.12" Easing="CubicEaseOut"/>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.1"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Button.actionIconButton:pointerover">
+        <Setter Property="Background" Value="{StaticResource HoverBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderMediumBrush}"/>
+        <Setter Property="RenderTransform" Value="scaleX(1.05) scaleY(1.05)"/>
+    </Style>
+    
+    <Style Selector="Button.actionIconButton:pressed">
+        <Setter Property="RenderTransform" Value="scaleX(0.95) scaleY(0.95)"/>
+    </Style>
+    
+    <Style Selector="Button.actionIconButton:focus-visible">
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+    
+    <Style Selector="Button.actionIconButton:disabled">
+        <Setter Property="Opacity" Value="0.35"/>
+        <Setter Property="Cursor" Value="Arrow"/>
+    </Style>
+    
+    <!-- Action Icon Button Variants with semantic colors -->
+    <Style Selector="Button.actionIconButton.success:pointerover">
+        <Setter Property="Background" Value="{StaticResource SuccessLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource SuccessBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.actionIconButton.error:pointerover">
+        <Setter Property="Background" Value="{StaticResource ErrorLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.actionIconButton.warning:pointerover">
+        <Setter Property="Background" Value="{StaticResource WarningLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.actionIconButton.neutral:pointerover">
+        <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource NeutralTextBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.actionIconButton.danger:pointerover">
+        <Setter Property="Background" Value="#FEE2E2"/>
+        <Setter Property="BorderBrush" Value="#991B1B"/>
+    </Style>
+    
+    <Style Selector="Button.actionIconButton.reset:pointerover">
+        <Setter Property="Background" Value="#E0E7FF"/>
+        <Setter Property="BorderBrush" Value="#6366F1"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!-- TOPBAR BUTTON (Icon + Text) -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     
     <Style Selector="Button.topBarButton">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="2"/>
         <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeMD}"/>
         <Setter Property="FontWeight" Value="Medium"/>
@@ -179,8 +318,9 @@
         <Setter Property="RenderTransform" Value="scaleX(1) scaleY(1)"/>
         <Setter Property="Transitions">
             <Transitions>
-                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.12"/>
-                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <BrushTransition Property="Background" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
             </Transitions>
         </Setter>
     </Style>
@@ -192,6 +332,25 @@
     
     <Style Selector="Button.topBarButton:pressed">
         <Setter Property="RenderTransform" Value="scaleX(0.98) scaleY(0.98)"/>
+    </Style>
+    
+    <Style Selector="Button.topBarButton:focus-visible">
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.topBarButton:disabled">
+        <Setter Property="Opacity" Value="0.5"/>
+        <Setter Property="Cursor" Value="Arrow"/>
+    </Style>
+    
+    <!-- TopBar Primary variant -->
+    <Style Selector="Button.topBarButton.primary">
+        <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextOnPrimaryBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.topBarButton.primary:pointerover">
+        <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
     </Style>
     
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -272,31 +431,38 @@
         <Setter Property="BorderBrush" Value="{StaticResource BorderMediumBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="6"/>
-        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="Padding" Value="10,8"/>
         <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeMD}"/>
-        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="MinHeight" Value="36"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Transitions">
             <Transitions>
-                <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
-                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <BrushTransition Property="Background" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <ThicknessTransition Property="BorderThickness" Duration="0:0:0.12"/>
             </Transitions>
         </Setter>
     </Style>
     
-    <Style Selector="TextBox.inlineEdit:focus">
-        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
-        <Setter Property="Background" Value="#FFFFFF"/>
+    <Style Selector="TextBox.inlineEdit:pointerover">
+        <Setter Property="BorderBrush" Value="#93C5FD"/>
     </Style>
     
-    <Style Selector="TextBox.inlineEdit:pointerover">
+    <Style Selector="TextBox.inlineEdit:focus">
         <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Background" Value="#FFFFFF"/>
     </Style>
     
     <Style Selector="TextBox.inlineEdit.error">
         <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}"/>
         <Setter Property="Background" Value="{StaticResource ErrorLightBrush}"/>
+    </Style>
+    
+    <Style Selector="TextBox.inlineEdit.error:focus">
+        <Setter Property="BorderBrush" Value="{StaticResource ErrorBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
     </Style>
     
     <!-- Phone Number TextBox (monospace) -->
@@ -324,14 +490,20 @@
         <Setter Property="Watermark" Value="Ghi chú cuộc gọi... (Ctrl+Enter để lưu, Esc để hủy)"/>
         <Setter Property="Transitions">
             <Transitions>
-                <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <ThicknessTransition Property="BorderThickness" Duration="0:0:0.12"/>
                 <DoubleTransition Property="MinHeight" Duration="0:0:0.15" Easing="CubicEaseInOut"/>
             </Transitions>
         </Setter>
     </Style>
     
+    <Style Selector="TextBox.noteTextArea:pointerover">
+        <Setter Property="BorderBrush" Value="#93C5FD"/>
+    </Style>
+    
     <Style Selector="TextBox.noteTextArea:focus">
         <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
     </Style>
     
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -363,22 +535,23 @@
         <Setter Property="BorderThickness" Value="0,0,0,1"/>
         <Setter Property="MinHeight" Value="52"/>
         <Setter Property="Padding" Value="16,8"/>
+        <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Transitions">
             <Transitions>
-                <BrushTransition Property="Background" Duration="0:0:0.12"/>
-                <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
+                <BrushTransition Property="Background" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.15" Easing="CubicEaseOut"/>
                 <ThicknessTransition Property="BorderThickness" Duration="0:0:0.12"/>
             </Transitions>
         </Setter>
     </Style>
     
     <Style Selector="Border.contactRow:pointerover">
-        <Setter Property="Background" Value="{StaticResource RowHoverBrush}"/>
+        <Setter Property="Background" Value="#F9FAFB"/>
     </Style>
     
     <!-- Editing Row Style -->
     <Style Selector="Border.contactRow.editing">
-        <Setter Property="Background" Value="#F0F7FF"/>
+        <Setter Property="Background" Value="#EFF6FF"/>
         <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="3,0,0,1"/>
     </Style>
@@ -577,19 +750,26 @@
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Margin" Value="0,2"/>
         <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="2"/>
         <Setter Property="CornerRadius" Value="8"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Transitions">
             <Transitions>
-                <BrushTransition Property="Background" Duration="0:0:0.12"/>
+                <BrushTransition Property="Background" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
             </Transitions>
         </Setter>
     </Style>
     
     <Style Selector="ListBox.sessionListBox ListBoxItem:pointerover">
-        <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+        <Setter Property="Background" Value="#F3F4F6"/>
+    </Style>
+    
+    <Style Selector="ListBox.sessionListBox ListBoxItem:focus-visible">
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
     </Style>
     
     <Style Selector="ListBox.sessionListBox ListBoxItem:selected">
@@ -598,6 +778,10 @@
     
     <Style Selector="ListBox.sessionListBox ListBoxItem:selected:pointerover">
         <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
+    </Style>
+    
+    <Style Selector="ListBox.sessionListBox ListBoxItem:selected:focus-visible">
+        <Setter Property="BorderBrush" Value="#93C5FD"/>
     </Style>
     
     <!-- Text color changes for selected state -->
@@ -647,6 +831,173 @@
     
     <Style Selector="Button.sessionListItem.selected:pointerover">
         <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- SORTABLE HEADER BUTTON -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="Button.sortableHeader">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Padding" Value="6,4"/>
+        <Setter Property="Margin" Value="-6,0,0,0"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Button.sortableHeader:pointerover">
+        <Setter Property="Background" Value="#E5E7EB"/>
+    </Style>
+    
+    <Style Selector="Button.sortableHeader:pressed">
+        <Setter Property="Background" Value="{StaticResource BorderMediumBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.sortableHeader:focus-visible">
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.sortableHeader TextBlock.sortIcon">
+        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- SEARCH INPUT -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="TextBox.searchInput">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="MinWidth" Value="200"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="MinHeight" Value="34"/>
+        <Setter Property="CaretBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="SelectionBrush" Value="#3B82F640"/>
+    </Style>
+    
+    <Style Selector="TextBox.searchInput:focus">
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    
+    <Style Selector="TextBox.searchInput /template/ Border">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="MinHeight" Value="34"/>
+    </Style>
+    
+    <Style Selector="TextBox.searchInput /template/ TextPresenter">
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- FILTER COMBOBOX -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <Style Selector="ComboBox.filterComboBox">
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderMediumBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="12,0"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Height" Value="36"/>
+        <Setter Property="MinHeight" Value="36"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+                <ThicknessTransition Property="BorderThickness" Duration="0:0:0.12"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="ComboBox.filterComboBox:pointerover">
+        <Setter Property="BorderBrush" Value="#93C5FD"/>
+    </Style>
+    
+    <Style Selector="ComboBox.filterComboBox:focus">
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+    
+    <Style Selector="ComboBox.filterComboBox /template/ ContentControl#ContentPresenter">
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- TOAST NOTIFICATION -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <!-- Toast container - handles animation visibility with fast dismiss -->
+    <Style Selector="Border.toastContainer">
+        <Setter Property="Opacity" Value="0"/>
+        <Setter Property="RenderTransform" Value="translateY(16px)"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <!-- Fast fade out (80ms) for immediate replacement -->
+                <DoubleTransition Property="Opacity" Duration="0:0:0.08" Easing="CubicEaseOut"/>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.08" Easing="CubicEaseOut"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <Style Selector="Border.toastContainer.visible">
+        <Setter Property="Opacity" Value="1"/>
+        <Setter Property="RenderTransform" Value="translateY(0)"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <!-- Smooth slide-in animation (180ms) for new toast -->
+                <DoubleTransition Property="Opacity" Duration="0:0:0.18" Easing="CubicEaseOut"/>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.18" Easing="CubicEaseOut"/>
+            </Transitions>
+        </Setter>
+    </Style>
+    
+    <!-- Toast pill shape -->
+    <Style Selector="Border.toastPill">
+        <Setter Property="CornerRadius" Value="24"/>
+        <Setter Property="Padding" Value="6,8,16,8"/>
+        <Setter Property="BoxShadow" Value="0 4 16 0 #20000000"/>
+    </Style>
+    
+    <!-- Toast icon circle -->
+    <Style Selector="Border.toastIconCircle">
+        <Setter Property="Width" Value="28"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="CornerRadius" Value="14"/>
+    </Style>
+    
+    <!-- Toast icon text -->
+    <Style Selector="TextBlock.toastIcon">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    
+    <!-- Toast message text -->
+    <Style Selector="TextBlock.toastMessage">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
     
 </Styles>

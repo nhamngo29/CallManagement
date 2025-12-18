@@ -11,23 +11,28 @@ namespace CallManagement.Models
         None = 0,
 
         /// <summary>
-        /// The call was answered.
-        /// </summary>
-        Answered = 1,
-
-        /// <summary>
         /// The call was not answered.
         /// </summary>
-        NoAnswer = 2,
-
-        /// <summary>
-        /// The phone number is invalid.
-        /// </summary>
-        InvalidNumber = 3,
+        NoAnswer = 1,
 
         /// <summary>
         /// The line was busy.
         /// </summary>
-        Busy = 4
+        Busy = 2,
+
+        /// <summary>
+        /// The phone number is invalid/does not exist.
+        /// </summary>
+        InvalidNumber = 3,
+
+        /// <summary>
+        /// Customer is interested (has demand).
+        /// </summary>
+        Interested = 4,
+
+        /// <summary>
+        /// Customer is not interested (no demand).
+        /// </summary>
+        NotInterested = 5
     }
 }

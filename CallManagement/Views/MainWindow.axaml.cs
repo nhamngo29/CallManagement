@@ -149,5 +149,16 @@ namespace CallManagement.Views
                 viewModel.CloseSendReportCommand.Execute(null);
             }
         }
+
+        /// <summary>
+        /// Handle click on daily report preview overlay background to close popup.
+        /// </summary>
+        private void DailyReportPreviewOverlay_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (DataContext is MainWindowViewModel viewModel)
+            {
+                viewModel.CloseDailyReportPreviewCommand.Execute(null);
+            }
+        }
     }
 }

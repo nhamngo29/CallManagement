@@ -20,7 +20,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!-- MAIN POPUP CONTAINER -->
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <Border Background="{StaticResource CardBackgroundBrush}"
+    <Border Background="{DynamicResource CardBackgroundBrush}"
             CornerRadius="16"
             BoxShadow="0 8 32 0 #33000000"
             MinWidth="450"
@@ -34,7 +34,7 @@
             <!-- HEADER -->
             <!-- ═══════════════════════════════════════════════════════════════ -->
             <Border Grid.Row="0"
-                    Background="{StaticResource PrimaryBrush}"
+                    Background="{DynamicResource PrimaryBrush}"
                     CornerRadius="16,16,0,0"
                     Padding="20,16">
                 <Grid ColumnDefinitions="*,Auto">
@@ -72,7 +72,7 @@
                     <!-- ─────────────────────────────────────────────────────── -->
                     <!-- FILTER SECTION -->
                     <!-- ─────────────────────────────────────────────────────── -->
-                    <Border Background="{StaticResource NeutralLightBrush}"
+                    <Border Background="{DynamicResource NeutralLightBrush}"
                             CornerRadius="12"
                             Padding="16">
                         <StackPanel Spacing="12">
@@ -113,8 +113,8 @@
                     <!-- ─────────────────────────────────────────────────────── -->
                     <!-- SESSIONS SECTION -->
                     <!-- ─────────────────────────────────────────────────────── -->
-                    <Border Background="{StaticResource CardBackgroundBrush}"
-                            BorderBrush="{StaticResource BorderLightBrush}"
+                    <Border Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource BorderLightBrush}"
                             BorderThickness="1"
                             CornerRadius="12"
                             Padding="16">
@@ -124,12 +124,12 @@
                             <Grid ColumnDefinitions="*,Auto">
                                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
                                     <TextBlock Classes="heading4" Text="📂 Sessions"/>
-                                    <Border Background="{StaticResource PrimaryLightBrush}"
+                                    <Border Background="{DynamicResource PrimaryLightBrush}"
                                             CornerRadius="10"
                                             Padding="8,2">
                                         <TextBlock Text="{Binding FilteredSessions.Count}"
                                                    FontSize="11"
-                                                   Foreground="{StaticResource PrimaryBrush}"
+                                                   Foreground="{DynamicResource PrimaryBrush}"
                                                    FontWeight="SemiBold"/>
                                     </Border>
                                 </StackPanel>
@@ -142,9 +142,9 @@
                             
                             <!-- Sessions List -->
                             <Border Height="200"
-                                    Background="{StaticResource NeutralLightBrush}"
+                                    Background="{DynamicResource NeutralLightBrush}"
                                     CornerRadius="8"
-                                    BorderBrush="{StaticResource BorderLightBrush}"
+                                    BorderBrush="{DynamicResource BorderLightBrush}"
                                     BorderThickness="1">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                                     <ItemsControl ItemsSource="{Binding FilteredSessions}"
@@ -168,11 +168,11 @@
                                                                    FontWeight="Medium"/>
                                                         
                                                         <Border Grid.Column="2"
-                                                                Background="{StaticResource NeutralLightBrush}"
+                                                                Background="{DynamicResource NeutralLightBrush}"
                                                                 CornerRadius="8"
                                                                 Padding="6,2">
                                                             <TextBlock FontSize="11"
-                                                                       Foreground="{StaticResource TextMutedBrush}">
+                                                                       Foreground="{DynamicResource TextMutedBrush}">
                                                                 <TextBlock.Text>
                                                                     <MultiBinding StringFormat="{}{0} contacts">
                                                                         <Binding Path="ContactCount"/>
@@ -190,18 +190,18 @@
                             
                             <!-- Empty State -->
                             <Border IsVisible="{Binding !FilteredSessions.Count}"
-                                    Background="{StaticResource WarningLightBrush}"
+                                    Background="{DynamicResource WarningLightBrush}"
                                     CornerRadius="8"
                                     Padding="12">
                                 <TextBlock Text="Không có session nào phù hợp với filter"
-                                           Foreground="{StaticResource WarningTextBrush}"
+                                           Foreground="{DynamicResource WarningTextBrush}"
                                            HorizontalAlignment="Center"
                                            FontSize="13"/>
                             </Border>
                             
                             <!-- Selection Summary -->
                             <TextBlock FontSize="12"
-                                       Foreground="{StaticResource TextMutedBrush}"
+                                       Foreground="{DynamicResource TextMutedBrush}"
                                        HorizontalAlignment="Right">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="Đã chọn: {0} session(s)">
@@ -220,10 +220,10 @@
                             Padding="12">
                         <Border.Styles>
                             <Style Selector="Border.success">
-                                <Setter Property="Background" Value="{StaticResource SuccessLightBrush}"/>
+                                <Setter Property="Background" Value="{DynamicResource SuccessLightBrush}"/>
                             </Style>
                             <Style Selector="Border.error">
-                                <Setter Property="Background" Value="{StaticResource ErrorLightBrush}"/>
+                                <Setter Property="Background" Value="{DynamicResource ErrorLightBrush}"/>
                             </Style>
                         </Border.Styles>
                         
@@ -233,7 +233,7 @@
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <TextBlock Text="✔️" FontSize="14"/>
                                     <TextBlock Text="{Binding ResultMessage}"
-                                               Foreground="{StaticResource SuccessTextBrush}"
+                                               Foreground="{DynamicResource SuccessTextBrush}"
                                                FontWeight="SemiBold"/>
                                 </StackPanel>
                             </StackPanel>
@@ -243,11 +243,11 @@
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <TextBlock Text="❌" FontSize="14"/>
                                     <TextBlock Text="{Binding ResultMessage}"
-                                               Foreground="{StaticResource ErrorTextBrush}"
+                                               Foreground="{DynamicResource ErrorTextBrush}"
                                                FontWeight="SemiBold"/>
                                 </StackPanel>
                                 <TextBlock Text="{Binding ErrorDetails}"
-                                           Foreground="{StaticResource ErrorTextBrush}"
+                                           Foreground="{DynamicResource ErrorTextBrush}"
                                            FontSize="12"
                                            TextWrapping="Wrap"
                                            IsVisible="{Binding ErrorDetails, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
@@ -289,14 +289,14 @@
             <!-- FOOTER BUTTONS -->
             <!-- ═══════════════════════════════════════════════════════════════ -->
             <Border Grid.Row="2"
-                    BorderBrush="{StaticResource BorderLightBrush}"
+                    BorderBrush="{DynamicResource BorderLightBrush}"
                     BorderThickness="0,1,0,0"
                     Padding="20,16">
                 <Grid ColumnDefinitions="*,Auto,Auto">
                     <!-- File info -->
                     <TextBlock Grid.Column="0"
                                FontSize="12"
-                               Foreground="{StaticResource TextMutedBrush}"
+                               Foreground="{DynamicResource TextMutedBrush}"
                                VerticalAlignment="Center">
                         <TextBlock.Text>
                             <MultiBinding StringFormat="Sẽ gửi {0} file Excel">

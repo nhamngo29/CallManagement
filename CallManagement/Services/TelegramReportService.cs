@@ -369,10 +369,11 @@ namespace CallManagement.Services
         {
             return status switch
             {
-                CallStatus.Answered => "Nghe máy",
-                CallStatus.NoAnswer => "Không nghe",
-                CallStatus.InvalidNumber => "Số không tồn tại",
+                CallStatus.Interested => "Có nhu cầu",
+                CallStatus.NotInterested => "Không nhu cầu",
+                CallStatus.NoAnswer => "Không bắt máy",
                 CallStatus.Busy => "Máy bận",
+                CallStatus.InvalidNumber => "Số không tồn tại",
                 _ => "Chưa gọi"
             };
         }
@@ -381,10 +382,11 @@ namespace CallManagement.Services
         {
             return status switch
             {
-                CallStatus.Answered => (XLColor.FromHtml("#DCFCE7"), XLColor.FromHtml("#166534")),
+                CallStatus.Interested => (XLColor.FromHtml("#DCFCE7"), XLColor.FromHtml("#166534")),
+                CallStatus.NotInterested => (XLColor.FromHtml("#FEE2E2"), XLColor.FromHtml("#991B1B")),
                 CallStatus.NoAnswer => (XLColor.FromHtml("#F3F4F6"), XLColor.FromHtml("#374151")),
-                CallStatus.InvalidNumber => (XLColor.FromHtml("#FEE2E2"), XLColor.FromHtml("#991B1B")),
                 CallStatus.Busy => (XLColor.FromHtml("#FEF3C7"), XLColor.FromHtml("#92400E")),
+                CallStatus.InvalidNumber => (XLColor.FromHtml("#7F1D1D"), XLColor.White),
                 _ => (XLColor.White, XLColor.FromHtml("#6B7280"))
             };
         }

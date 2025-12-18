@@ -32,6 +32,9 @@ namespace CallManagement.Models
         [ObservableProperty]
         private bool _isActionsEnabled = true;
 
+        [ObservableProperty]
+        private DateTime? _lastCalledAt;
+
         // ═══════════════════════════════════════════════════════════════════════
         // NOTE PROPERTY
         // ═══════════════════════════════════════════════════════════════════════

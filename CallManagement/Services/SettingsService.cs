@@ -35,6 +35,11 @@ namespace CallManagement.Services
         /// </summary>
         public static SettingsService Instance { get; private set; } = null!;
 
+        /// <summary>
+        /// Event raised when daily report settings are changed.
+        /// </summary>
+        public event EventHandler<DailyReportSettings>? DailyReportSettingsChanged;
+
         // ═══════════════════════════════════════════════════════════════════════
         // SETTINGS MODEL
         // ═══════════════════════════════════════════════════════════════════════
@@ -43,6 +48,13 @@ namespace CallManagement.Services
         {
             public string BotToken { get; set; } = string.Empty;
             public string ChatId { get; set; } = string.Empty;
+        }
+
+        public class DailyReportSettings
+        {
+            public bool IsEnabled { get; set; }
+            public TimeSpan SendTime { get; set; } = new TimeSpan(18, 0, 0); // Default 18:00
+            public DateTime? LastSentDate { get; set; }
         }
 
         // ═══════════════════════════════════════════════════════════════════════
@@ -194,6 +206,88 @@ namespace CallManagement.Services
 
             var sql = "DELETE FROM AppSettings WHERE Key IN ('TelegramBotToken', 'TelegramChatId')";
             await using var cmd = new SqliteCommand(sql, connection);
+            await cmd.ExecuteNonQueryAsync();
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // DAILY REPORT SETTINGS OPERATIONS
+        // ═══════════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Save daily report auto-send settings to the database.
+        /// </summary>
+        public async Task SaveDailyReportSettingsAsync(DailyReportSettings settings)
+        {
+            await using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var sql = @"
+                REPLACE INTO AppSettings (Key, Value) VALUES ('DailyReportEnabled', @Enabled);
+                REPLACE INTO AppSettings (Key, Value) VALUES ('DailyReportSendTime', @SendTime);
+            ";
+
+            await using var cmd = new SqliteCommand(sql, connection);
+            cmd.Parameters.AddWithValue("@Enabled", settings.IsEnabled ? "1" : "0");
+            cmd.Parameters.AddWithValue("@SendTime", settings.SendTime.ToString(@"hh\:mm"));
+            await cmd.ExecuteNonQueryAsync();
+
+            // Raise event to notify subscribers
+            DailyReportSettingsChanged?.Invoke(this, settings);
+        }
+
+        /// <summary>
+        /// Load daily report auto-send settings from the database.
+        /// </summary>
+        public async Task<DailyReportSettings> LoadDailyReportSettingsAsync()
+        {
+            var settings = new DailyReportSettings();
+
+            await using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var sql = "SELECT Key, Value FROM AppSettings WHERE Key IN ('DailyReportEnabled', 'DailyReportSendTime', 'DailyReportLastSent')";
+            await using var cmd = new SqliteCommand(sql, connection);
+            await using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                var key = reader.GetString(0);
+                var value = reader.GetString(1);
+
+                switch (key)
+                {
+                    case "DailyReportEnabled":
+                        settings.IsEnabled = value == "1";
+                        break;
+                    case "DailyReportSendTime":
+                        if (TimeSpan.TryParse(value, out var time))
+                        {
+                            settings.SendTime = time;
+                        }
+                        break;
+                    case "DailyReportLastSent":
+                        if (DateTime.TryParse(value, out var lastSent))
+                        {
+                            settings.LastSentDate = lastSent;
+                        }
+                        break;
+                }
+            }
+
+            return settings;
+        }
+
+        /// <summary>
+        /// Save the last daily report sent date to prevent duplicate sends.
+        /// </summary>
+        public async Task SaveLastDailyReportSentDateAsync(DateTime date)
+        {
+            await using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var sql = "REPLACE INTO AppSettings (Key, Value) VALUES ('DailyReportLastSent', @Date)";
+            await using var cmd = new SqliteCommand(sql, connection);
+            cmd.Parameters.AddWithValue("@Date", date.ToString("O"));
             await cmd.ExecuteNonQueryAsync();
         }
 

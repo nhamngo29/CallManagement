@@ -98,11 +98,37 @@ namespace CallManagement.ViewModels
         [ObservableProperty]
         private bool _isTelegramConfigured;
 
+        /// <summary>
+        /// Whether auto-send daily report is enabled.
+        /// When true, the manual Send Daily Report button should be hidden.
+        /// </summary>
+        [ObservableProperty]
+        private bool _isAutoSendDailyReportEnabled;
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // DAILY REPORT PREVIEW
+        // ═══════════════════════════════════════════════════════════════════════
+
+        [ObservableProperty]
+        private bool _showDailyReportPreview;
+
+        [ObservableProperty]
+        private DailyReportPreviewViewModel? _dailyReportPreviewViewModel;
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // NOTIFICATION SERVICE
+        // ═══════════════════════════════════════════════════════════════════════
+
+        public NotificationViewModel NotificationViewModel { get; } = new();
+        
+        private INotificationService NotificationService => Services.NotificationService.Instance;
+
         public int TotalCount => SelectedTab?.TotalCount ?? 0;
-        public int AnsweredCount => SelectedTab?.AnsweredCount ?? 0;
+        public int InterestedCount => SelectedTab?.InterestedCount ?? 0;
+        public int NotInterestedCount => SelectedTab?.NotInterestedCount ?? 0;
         public int NoAnswerCount => SelectedTab?.NoAnswerCount ?? 0;
-        public int InvalidCount => SelectedTab?.InvalidCount ?? 0;
         public int BusyCount => SelectedTab?.BusyCount ?? 0;
+        public int InvalidCount => SelectedTab?.InvalidCount ?? 0;
 
         public bool IsCurrentTabEditable => SelectedTab?.IsCurrentSession ?? false;
 
@@ -152,6 +178,21 @@ namespace CallManagement.ViewModels
                 // Check Telegram configuration
                 await CheckTelegramConfigurationAsync();
 
+                // Load auto-send daily report setting
+                await LoadAutoSendDailyReportSettingAsync();
+
+                // Subscribe to settings changes
+                if (SettingsService.Instance != null)
+                {
+                    SettingsService.Instance.DailyReportSettingsChanged += OnDailyReportSettingsChanged;
+                }
+
+                // Subscribe to DailyReportScheduler events for toast notifications
+                if (DailyReportScheduler.Instance != null)
+                {
+                    DailyReportScheduler.Instance.DailyReportSent += OnDailyReportAutoSent;
+                }
+
                 StatusMessage = "San sang";
             }
             catch (Exception ex)
@@ -195,10 +236,11 @@ namespace CallManagement.ViewModels
             SyncSidebarSelection(value);
 
             OnPropertyChanged(nameof(TotalCount));
-            OnPropertyChanged(nameof(AnsweredCount));
+            OnPropertyChanged(nameof(InterestedCount));
+            OnPropertyChanged(nameof(NotInterestedCount));
             OnPropertyChanged(nameof(NoAnswerCount));
-            OnPropertyChanged(nameof(InvalidCount));
             OnPropertyChanged(nameof(BusyCount));
+            OnPropertyChanged(nameof(InvalidCount));
             OnPropertyChanged(nameof(IsCurrentTabEditable));
             OnPropertyChanged(nameof(Contacts));
         }
@@ -243,10 +285,11 @@ namespace CallManagement.ViewModels
             
             // Update UI after data loaded
             OnPropertyChanged(nameof(TotalCount));
-            OnPropertyChanged(nameof(AnsweredCount));
+            OnPropertyChanged(nameof(InterestedCount));
+            OnPropertyChanged(nameof(NotInterestedCount));
             OnPropertyChanged(nameof(NoAnswerCount));
-            OnPropertyChanged(nameof(InvalidCount));
             OnPropertyChanged(nameof(BusyCount));
+            OnPropertyChanged(nameof(InvalidCount));
             OnPropertyChanged(nameof(Contacts));
         }
 
@@ -402,9 +445,9 @@ namespace CallManagement.ViewModels
         private async Task SaveSession()
         {
             if (_databaseService == null || CurrentSessionTab == null) return;
-            if (CurrentSessionTab.Contacts.Count == 0)
+            if (CurrentSessionTab.AllContacts.Count == 0)
             {
-                StatusMessage = "Khong co du lieu de luu";
+                NotificationService.ShowWarning("Không có dữ liệu để lưu");
                 return;
             }
 
@@ -415,8 +458,8 @@ namespace CallManagement.ViewModels
             {
                 var sessionKey = await _databaseService.GenerateUniqueSessionKeyAsync();
                 var session = await _databaseService.CreateSessionAsync(sessionKey);
-                await _databaseService.SaveContactsAsync(sessionKey, CurrentSessionTab.Contacts);
-                session.ContactCount = CurrentSessionTab.Contacts.Count;
+                await _databaseService.SaveContactsAsync(sessionKey, CurrentSessionTab.AllContacts);
+                session.ContactCount = CurrentSessionTab.AllContacts.Count;
 
                 // Create history tab with cloned data BEFORE clearing current
                 var historyTab = new SessionTabViewModel(session);
@@ -431,7 +474,7 @@ namespace CallManagement.ViewModels
                 // ═══════════════════════════════════════════════════════════════
                 // CLEAR CURRENT SESSION - Reset to empty state
                 // ═══════════════════════════════════════════════════════════════
-                CurrentSessionTab.Contacts.Clear();
+                CurrentSessionTab.AllContacts.Clear();
                 CurrentSessionTab.UpdateStatistics();
                 
                 // Select current session (back to empty state)
@@ -441,10 +484,12 @@ namespace CallManagement.ViewModels
                 
                 UpdateStatisticsNotification();
 
-                StatusMessage = $"Đã lưu session {session.FormattedDate}. Current session đã được reset.";
+                NotificationService.ShowSuccess($"Đã lưu session {session.FormattedDate}");
+                StatusMessage = string.Empty;
             }
             catch (Exception ex)
             {
+                NotificationService.ShowError("Lỗi lưu session");
                 StatusMessage = "Loi luu: " + ex.Message;
                 System.Diagnostics.Debug.WriteLine("Save failed: " + ex);
             }
@@ -513,10 +558,13 @@ namespace CallManagement.ViewModels
                     SelectedTab = CurrentSessionTab;
                     SelectedSession = Sessions.FirstOrDefault(s => s.IsCurrent);
                 }
-                StatusMessage = "Da xoa phien";
+                
+                NotificationService.ShowSuccess("Đã xóa session");
+                StatusMessage = string.Empty;
             }
             catch (Exception ex)
             {
+                NotificationService.ShowError("Lỗi xóa session");
                 StatusMessage = "Loi xoa: " + ex.Message;
             }
             finally
@@ -537,10 +585,10 @@ namespace CallManagement.ViewModels
         private void ClearCurrentSession()
         {
             if (CurrentSessionTab == null) return;
-            CurrentSessionTab.Contacts.Clear();
+            CurrentSessionTab.AllContacts.Clear();
             CurrentSessionTab.UpdateStatistics();
             UpdateStatisticsNotification();
-            StatusMessage = "Da xoa du lieu phien hien tai";
+            NotificationService.ShowInfo("Đã xóa dữ liệu phiên hiện tại");
         }
 
         [RelayCommand]
@@ -582,7 +630,7 @@ namespace CallManagement.ViewModels
 
                 if (!result.IsSuccess)
                 {
-                    StatusMessage = result.ErrorMessage ?? "Import thất bại";
+                    NotificationService.ShowError(result.ErrorMessage ?? "Import thất bại");
                     return;
                 }
 
@@ -590,18 +638,19 @@ namespace CallManagement.ViewModels
                 foreach (var contact in result.Contacts)
                 {
                     // Assign new ID based on existing contacts
-                    contact.Id = CurrentSessionTab.Contacts.Count + 1;
-                    CurrentSessionTab.Contacts.Add(contact);
+                    contact.Id = CurrentSessionTab.AllContacts.Count + 1;
+                    CurrentSessionTab.AllContacts.Add(contact);
                 }
 
                 CurrentSessionTab.UpdateStatistics();
                 UpdateStatisticsNotification();
 
-                StatusMessage = result.GetSummaryMessage();
+                NotificationService.ShowSuccess($"Đã import {result.Contacts.Count} liên hệ");
+                StatusMessage = string.Empty;
             }
             catch (Exception ex)
             {
-                StatusMessage = $"Lỗi import: {ex.Message}";
+                NotificationService.ShowError("Lỗi import file Excel");
                 System.Diagnostics.Debug.WriteLine($"Import error: {ex}");
             }
             finally
@@ -615,9 +664,9 @@ namespace CallManagement.ViewModels
         {
             if (MainWindow == null || SelectedTab == null) return;
 
-            if (SelectedTab.Contacts.Count == 0)
+            if (SelectedTab.AllContacts.Count == 0)
             {
-                StatusMessage = "Không có dữ liệu để xuất";
+                NotificationService.ShowWarning("Không có dữ liệu để xuất");
                 return;
             }
 
@@ -654,22 +703,23 @@ namespace CallManagement.ViewModels
                 IsLoading = true;
                 StatusMessage = "Đang xuất Excel...";
 
-                // Export contacts
+                // Export contacts (use AllContacts for full data)
                 var sessionName = SelectedTab.IsCurrentSession 
                     ? "Current Session" 
                     : SelectedTab.Session?.FormattedDate ?? "Session";
 
-                await _excelService.ExportAsync(filePath, SelectedTab.Contacts, sessionName);
+                await _excelService.ExportAsync(filePath, SelectedTab.AllContacts, sessionName);
 
-                StatusMessage = $"Đã xuất {SelectedTab.Contacts.Count} liên hệ";
+                NotificationService.ShowSuccess($"Đã xuất {SelectedTab.AllContacts.Count} liên hệ");
+                StatusMessage = string.Empty;
             }
             catch (IOException ex) when (ex.Message.Contains("being used") || ex.Message.Contains("access"))
             {
-                StatusMessage = "File đang được mở. Vui lòng đóng file và thử lại.";
+                NotificationService.ShowError("File đang được mở. Vui lòng đóng và thử lại");
             }
             catch (Exception ex)
             {
-                StatusMessage = $"Lỗi xuất: {ex.Message}";
+                NotificationService.ShowError("Lỗi xuất file Excel");
                 System.Diagnostics.Debug.WriteLine($"Export error: {ex}");
             }
             finally
@@ -692,21 +742,32 @@ namespace CallManagement.ViewModels
                 if (clipboard != null)
                 {
                     await clipboard.SetTextAsync(contact.PhoneNumber);
-                    StatusMessage = "Da copy: " + contact.PhoneNumber;
+                    NotificationService.ShowSuccess($"Đã copy: {contact.PhoneNumber}");
                 }
             }
             catch (Exception ex)
             {
-                StatusMessage = "Loi copy: " + ex.Message;
+                NotificationService.ShowError("Lỗi copy số điện thoại");
+                System.Diagnostics.Debug.WriteLine($"Copy error: {ex}");
             }
         }
 
         [RelayCommand]
-        private void SetAnswered(Contact? contact)
+        private void SetInterested(Contact? contact)
         {
             if (contact == null || SelectedTab == null) return;
-            SelectedTab.SetAnsweredCommand.Execute(contact);
+            SelectedTab.SetInterestedCommand.Execute(contact);
             UpdateStatisticsNotification();
+            NotificationService.ShowSuccess($"✓ {contact.Name}: Có nhu cầu");
+        }
+
+        [RelayCommand]
+        private void SetNotInterested(Contact? contact)
+        {
+            if (contact == null || SelectedTab == null) return;
+            SelectedTab.SetNotInterestedCommand.Execute(contact);
+            UpdateStatisticsNotification();
+            NotificationService.ShowInfo($"✓ {contact.Name}: Không nhu cầu");
         }
 
         [RelayCommand]
@@ -715,6 +776,7 @@ namespace CallManagement.ViewModels
             if (contact == null || SelectedTab == null) return;
             SelectedTab.SetNoAnswerCommand.Execute(contact);
             UpdateStatisticsNotification();
+            NotificationService.ShowInfo($"✓ {contact.Name}: Không bắt máy");
         }
 
         [RelayCommand]
@@ -723,6 +785,7 @@ namespace CallManagement.ViewModels
             if (contact == null || SelectedTab == null) return;
             SelectedTab.SetInvalidNumberCommand.Execute(contact);
             UpdateStatisticsNotification();
+            NotificationService.ShowWarning($"✓ {contact.Name}: Số không tồn tại");
         }
 
         [RelayCommand]
@@ -731,6 +794,7 @@ namespace CallManagement.ViewModels
             if (contact == null || SelectedTab == null) return;
             SelectedTab.SetBusyCommand.Execute(contact);
             UpdateStatisticsNotification();
+            NotificationService.ShowInfo($"✓ {contact.Name}: Máy bận");
         }
 
         [RelayCommand]
@@ -744,10 +808,11 @@ namespace CallManagement.ViewModels
         private void UpdateStatisticsNotification()
         {
             OnPropertyChanged(nameof(TotalCount));
-            OnPropertyChanged(nameof(AnsweredCount));
+            OnPropertyChanged(nameof(InterestedCount));
+            OnPropertyChanged(nameof(NotInterestedCount));
             OnPropertyChanged(nameof(NoAnswerCount));
-            OnPropertyChanged(nameof(InvalidCount));
             OnPropertyChanged(nameof(BusyCount));
+            OnPropertyChanged(nameof(InvalidCount));
         }
 
         [RelayCommand]
@@ -866,6 +931,50 @@ namespace CallManagement.ViewModels
             }
         }
 
+        /// <summary>
+        /// Load the auto-send daily report setting from database.
+        /// </summary>
+        private async Task LoadAutoSendDailyReportSettingAsync()
+        {
+            if (SettingsService.Instance == null) return;
+
+            try
+            {
+                var settings = await SettingsService.Instance.LoadDailyReportSettingsAsync();
+                IsAutoSendDailyReportEnabled = settings.IsEnabled;
+            }
+            catch
+            {
+                IsAutoSendDailyReportEnabled = false;
+            }
+        }
+
+        /// <summary>
+        /// Handle daily report settings changed from Settings screen.
+        /// </summary>
+        private void OnDailyReportSettingsChanged(object? sender, SettingsService.DailyReportSettings settings)
+        {
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                IsAutoSendDailyReportEnabled = settings.IsEnabled;
+            });
+        }
+
+        /// <summary>
+        /// Handle auto-sent daily report event - show toast notification.
+        /// </summary>
+        private void OnDailyReportAutoSent(object? sender, DailyReportSentEventArgs e)
+        {
+            if (e.IsSuccess)
+            {
+                NotificationService.ShowSuccess($"✅ Auto Daily Report: {e.Message}");
+            }
+            else
+            {
+                NotificationService.ShowError($"❌ Auto Daily Report failed: {e.Message}");
+            }
+        }
+
         [RelayCommand]
         private async Task OpenSendReport()
         {
@@ -880,6 +989,90 @@ namespace CallManagement.ViewModels
 
             await SendReportViewModel.InitializeAsync(_databaseService);
             ShowSendReport = true;
+        }
+
+        [RelayCommand]
+        private async Task SendDailyReport()
+        {
+            if (_databaseService == null) return;
+
+            IsLoading = true;
+            StatusMessage = "Đang tải preview Daily Report...";
+
+            try
+            {
+                // Create and initialize the preview ViewModel
+                DailyReportPreviewViewModel = new DailyReportPreviewViewModel(_databaseService);
+                
+                // Subscribe to events
+                DailyReportPreviewViewModel.CloseRequested += () =>
+                {
+                    ShowDailyReportPreview = false;
+                };
+
+                DailyReportPreviewViewModel.ReportSent += (result) =>
+                {
+                    NotificationService.ShowSuccess($"Daily Report đã gửi thành công! ({result.TotalCalls} cuộc gọi, {result.InterestedCount} có nhu cầu)");
+                };
+
+                // Load preview content
+                await DailyReportPreviewViewModel.LoadPreviewAsync(DateTime.Today);
+
+                // Show the preview popup
+                ShowDailyReportPreview = true;
+            }
+            catch (Exception ex)
+            {
+                NotificationService.ShowError($"Lỗi: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"SendDailyReport error: {ex}");
+            }
+            finally
+            {
+                IsLoading = false;
+                StatusMessage = string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Send daily report directly without preview (for auto-send scheduled task).
+        /// </summary>
+        public async Task SendDailyReportDirectAsync(DateTime date)
+        {
+            if (_databaseService == null) return;
+
+            try
+            {
+                using var reportService = new DailyReportService(_databaseService);
+                
+                // Validate configuration first
+                if (!await reportService.IsConfiguredAsync())
+                {
+                    NotificationService.ShowError("Telegram chưa được cấu hình cho auto-send.");
+                    return;
+                }
+
+                var result = await reportService.SendDailyReportAsync(date);
+
+                if (result.IsSuccess)
+                {
+                    NotificationService.ShowSuccess($"Auto Daily Report đã gửi! ({result.TotalCalls} cuộc gọi)");
+                }
+                else
+                {
+                    NotificationService.ShowError($"Auto Daily Report thất bại: {result.ErrorMessage}");
+                }
+            }
+            catch (Exception ex)
+            {
+                NotificationService.ShowError($"Lỗi auto-send: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"SendDailyReportDirectAsync error: {ex}");
+            }
+        }
+
+        [RelayCommand]
+        private void CloseDailyReportPreview()
+        {
+            ShowDailyReportPreview = false;
         }
 
         [RelayCommand]

@@ -289,7 +289,9 @@ namespace CallManagement.Services
                     cmd.Parameters.AddWithValue("@Company", contact.Company ?? string.Empty);
                     cmd.Parameters.AddWithValue("@Status", (int)contact.Status);
                     cmd.Parameters.AddWithValue("@Note", contact.Note ?? string.Empty);
-                    cmd.Parameters.AddWithValue("@LastCalledAt", DBNull.Value);
+                    cmd.Parameters.AddWithValue("@LastCalledAt", contact.LastCalledAt.HasValue 
+                        ? contact.LastCalledAt.Value.ToString("O") 
+                        : (object)DBNull.Value);
                     await cmd.ExecuteNonQueryAsync();
                     count++;
                 }
@@ -417,6 +419,76 @@ namespace CallManagement.Services
             var contactCount = Convert.ToInt32(await cmd2.ExecuteScalarAsync());
 
             return (sessionCount, contactCount);
+        }
+
+        /// <summary>
+        /// Get contacts by LastCalledAt date (for daily reports).
+        /// Retrieves all contacts where LastCalledAt falls within the specified date (00:00 to 23:59).
+        /// </summary>
+        public async Task<List<ContactEntity>> GetContactsByLastCalledDateAsync(DateTime date)
+        {
+            var contacts = new List<ContactEntity>();
+
+            await using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            // Get date range for the specified day
+            var startDate = date.Date.ToString("O");
+            var endDate = date.Date.AddDays(1).AddTicks(-1).ToString("O");
+
+            var sql = @"
+                SELECT * FROM Contact 
+                WHERE LastCalledAt IS NOT NULL 
+                  AND LastCalledAt >= @StartDate 
+                  AND LastCalledAt <= @EndDate
+                  AND Status != 0
+                ORDER BY LastCalledAt DESC
+            ";
+
+            await using var cmd = new SqliteCommand(sql, connection);
+            cmd.Parameters.AddWithValue("@StartDate", startDate);
+            cmd.Parameters.AddWithValue("@EndDate", endDate);
+
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                contacts.Add(new ContactEntity
+                {
+                    Id = reader.GetInt32(0),
+                    SessionKey = reader.GetString(1),
+                    OriginalId = reader.GetInt32(2),
+                    Name = reader.GetString(3),
+                    PhoneNumber = reader.GetString(4),
+                    Company = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
+                    Status = reader.GetInt32(6),
+                    Note = reader.IsDBNull(7) ? string.Empty : reader.GetString(7),
+                    LastCalledAt = reader.IsDBNull(8) ? null : reader.GetString(8)
+                });
+            }
+
+            return contacts;
+        }
+
+        /// <summary>
+        /// Update contact status and set LastCalledAt timestamp.
+        /// </summary>
+        public async Task UpdateContactStatusAsync(int contactId, int status)
+        {
+            await using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var sql = @"
+                UPDATE Contact 
+                SET Status = @Status, LastCalledAt = @LastCalledAt
+                WHERE Id = @Id
+            ";
+
+            await using var cmd = new SqliteCommand(sql, connection);
+            cmd.Parameters.AddWithValue("@Id", contactId);
+            cmd.Parameters.AddWithValue("@Status", status);
+            cmd.Parameters.AddWithValue("@LastCalledAt", DateTime.Now.ToString("O"));
+            
+            await cmd.ExecuteNonQueryAsync();
         }
 
         public void Dispose()

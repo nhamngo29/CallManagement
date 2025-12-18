@@ -1,0 +1,192 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CallManagement.ViewModels"
+             xmlns:conv="using:CallManagement.Converters"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="550" d:DesignHeight="600"
+             x:Class="CallManagement.Views.DailyReportPreviewView"
+             x:DataType="vm:DailyReportPreviewViewModel"
+             Focusable="True"
+             KeyDown="OnKeyDown">
+    
+    <Design.DataContext>
+        <vm:DailyReportPreviewViewModel/>
+    </Design.DataContext>
+    
+    <UserControl.Resources>
+        <conv:InverseBoolConverter x:Key="InverseBool"/>
+    </UserControl.Resources>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- MAIN POPUP CONTAINER -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <Border Background="{DynamicResource CardBackgroundBrush}"
+            CornerRadius="16"
+            BoxShadow="0 8 32 0 #33000000"
+            MinWidth="500"
+            MaxWidth="600"
+            MaxHeight="700"
+            Padding="0">
+        
+        <Grid RowDefinitions="Auto,*,Auto">
+            
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- HEADER -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource PrimaryBrush}"
+                    CornerRadius="16,16,0,0"
+                    Padding="20,16">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="📊 Daily Report Preview"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="White"/>
+                        <TextBlock FontSize="12"
+                                   Foreground="#FFFFFFCC">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}Xem trước báo cáo ngày {0:dd/MM/yyyy}">
+                                    <Binding Path="ReportDate"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                    
+                    <Button Grid.Column="1"
+                            Classes="iconButton"
+                            Command="{Binding CloseCommand}"
+                            Background="Transparent"
+                            Width="32" Height="32"
+                            ToolTip.Tip="Đóng (ESC)">
+                        <TextBlock Text="✕" FontSize="16" Foreground="White" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                </Grid>
+            </Border>
+            
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- CONTENT - MARKDOWN PREVIEW -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <Border Grid.Row="1"
+                    Margin="20"
+                    Background="{DynamicResource NeutralLightBrush}"
+                    CornerRadius="12"
+                    BorderBrush="{DynamicResource BorderLightBrush}"
+                    BorderThickness="1">
+                
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              Padding="16">
+                    
+                    <!-- Report Content -->
+                    <SelectableTextBlock Text="{Binding ReportMarkdown}"
+                                         TextWrapping="Wrap"
+                                         FontFamily="Consolas, Monaco, 'Courier New', monospace"
+                                         FontSize="13"
+                                         LineHeight="20"
+                                         Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    
+                </ScrollViewer>
+            </Border>
+            
+            <!-- Error Message -->
+            <Border Grid.Row="1"
+                    Margin="20"
+                    Background="{DynamicResource ErrorLightBrush}"
+                    CornerRadius="8"
+                    Padding="12"
+                    VerticalAlignment="Top"
+                    IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="⚠️" FontSize="14" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               Foreground="{DynamicResource ErrorTextBrush}"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- FOOTER - ACTION BUTTONS -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource NeutralLightBrush}"
+                    CornerRadius="0,0,16,16"
+                    Padding="20,16">
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                    
+                    <!-- Info Text -->
+                    <TextBlock Grid.Column="0"
+                               Text="Nội dung trên sẽ được gửi qua Telegram"
+                               FontSize="12"
+                               Foreground="{DynamicResource TextMutedBrush}"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding HasData}"/>
+                    
+                    <!-- No Data Warning -->
+                    <TextBlock Grid.Column="0"
+                               Text="⚠️ Không có dữ liệu để gửi"
+                               FontSize="12"
+                               Foreground="{DynamicResource WarningTextBrush}"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding !HasData}"/>
+                    
+                    <!-- Cancel Button (Default Focus for Safety) -->
+                    <Button Grid.Column="1"
+                            x:Name="CancelButton"
+                            Classes="secondary"
+                            Command="{Binding CancelCommand}"
+                            Content="Cancel"
+                            Margin="0,0,12,0"
+                            MinWidth="100"
+                            IsEnabled="{Binding !IsSending}"
+                            ToolTip.Tip="Hủy bỏ (ESC)"/>
+                    
+                    <!-- Send Button -->
+                    <Button Grid.Column="2"
+                            Classes="primary"
+                            Command="{Binding SendReportCommand}"
+                            MinWidth="140"
+                            IsEnabled="{Binding HasData}"
+                            ToolTip.Tip="Gửi report qua Telegram (Enter)">
+                        <Panel>
+                            <!-- Normal State -->
+                            <StackPanel Orientation="Horizontal" 
+                                        Spacing="8"
+                                        IsVisible="{Binding !IsSending}">
+                                <TextBlock Text="📤" FontSize="14" VerticalAlignment="Center"/>
+                                <TextBlock Text="Send Report" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <!-- Sending State -->
+                            <StackPanel Orientation="Horizontal" 
+                                        Spacing="8"
+                                        IsVisible="{Binding IsSending}">
+                                <TextBlock Text="⏳" FontSize="14" VerticalAlignment="Center"/>
+                                <TextBlock Text="Đang gửi..." VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Panel>
+                    </Button>
+                </Grid>
+            </Border>
+            
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- LOADING OVERLAY -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <Border Grid.Row="0" Grid.RowSpan="3"
+                    Background="#80FFFFFF"
+                    CornerRadius="16"
+                    IsVisible="{Binding IsSending}">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+                    <TextBlock Text="📤" FontSize="32" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Đang gửi Daily Report..."
+                               FontSize="14"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

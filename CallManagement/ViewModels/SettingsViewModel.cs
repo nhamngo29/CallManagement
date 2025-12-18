@@ -2,6 +2,7 @@ using CallManagement.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -67,6 +68,32 @@ namespace CallManagement.ViewModels
         [ObservableProperty]
         private bool _isStatusSuccess;
 
+        // ═══════════════════════════════════════════════════════════════════════
+        // DAILY REPORT SETTINGS
+        // ═══════════════════════════════════════════════════════════════════════
+
+        [ObservableProperty]
+        private bool _enableAutoSendDailyReport;
+
+        [ObservableProperty]
+        private TimeSpan _dailyReportSendTime = new TimeSpan(18, 0, 0);
+
+        [ObservableProperty]
+        private int _selectedHour = 18;
+
+        [ObservableProperty]
+        private int _selectedMinute = 0;
+
+        /// <summary>
+        /// Available hours for the time picker (0-23).
+        /// </summary>
+        public int[] AvailableHours { get; } = Enumerable.Range(0, 24).ToArray();
+
+        /// <summary>
+        /// Available minutes for the time picker (0, 15, 30, 45).
+        /// </summary>
+        public int[] AvailableMinutes { get; } = new[] { 0, 15, 30, 45 };
+
         private SettingsService? _settingsService;
 
         // ═══════════════════════════════════════════════════════════════════════
@@ -100,14 +127,32 @@ namespace CallManagement.ViewModels
 
             try
             {
+                // Load Telegram settings
                 var settings = await _settingsService.LoadTelegramSettingsAsync();
                 TelegramBotToken = settings.BotToken;
                 TelegramChatId = settings.ChatId;
+
+                // Load daily report settings
+                var dailyReportSettings = await _settingsService.LoadDailyReportSettingsAsync();
+                EnableAutoSendDailyReport = dailyReportSettings.IsEnabled;
+                DailyReportSendTime = dailyReportSettings.SendTime;
+                SelectedHour = dailyReportSettings.SendTime.Hours;
+                SelectedMinute = dailyReportSettings.SendTime.Minutes;
             }
             catch
             {
                 // Silently fail - settings will be empty
             }
+        }
+
+        partial void OnSelectedHourChanged(int value)
+        {
+            DailyReportSendTime = new TimeSpan(value, SelectedMinute, 0);
+        }
+
+        partial void OnSelectedMinuteChanged(int value)
+        {
+            DailyReportSendTime = new TimeSpan(SelectedHour, value, 0);
         }
 
         // ═══════════════════════════════════════════════════════════════════════
@@ -166,13 +211,23 @@ namespace CallManagement.ViewModels
 
             try
             {
-                var settings = new SettingsService.TelegramSettings
+                // Save Telegram settings
+                var telegramSettings = new SettingsService.TelegramSettings
                 {
                     BotToken = TelegramBotToken.Trim(),
                     ChatId = TelegramChatId.Trim()
                 };
 
-                await _settingsService.SaveTelegramSettingsAsync(settings);
+                await _settingsService.SaveTelegramSettingsAsync(telegramSettings);
+
+                // Save Daily Report settings
+                var dailyReportSettings = new SettingsService.DailyReportSettings
+                {
+                    IsEnabled = EnableAutoSendDailyReport,
+                    SendTime = DailyReportSendTime
+                };
+
+                await _settingsService.SaveDailyReportSettingsAsync(dailyReportSettings);
                 
                 ShowSuccessStatus("Đã lưu cài đặt thành công ✔️");
             }

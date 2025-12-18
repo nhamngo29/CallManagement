@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CallManagement.ViewModels"
+             xmlns:conv="using:CallManagement.Converters"
+             mc:Ignorable="d"
+             x:Class="CallManagement.Views.NotificationView"
+             x:DataType="vm:NotificationViewModel"
+             IsHitTestVisible="False">
+    
+    <UserControl.Resources>
+        <conv:NotificationTypeToBackgroundConverter x:Key="TypeToBackgroundConverter"/>
+        <conv:NotificationTypeToForegroundConverter x:Key="TypeToForegroundConverter"/>
+        <conv:NotificationTypeToIconBackgroundConverter x:Key="TypeToIconBackgroundConverter"/>
+    </UserControl.Resources>
+    
+    <!-- Container positioned at bottom center -->
+    <Panel>
+        <!-- Toast notification -->
+        <Border x:Name="ToastContainer"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Margin="0,0,0,24"
+                IsVisible="{Binding NotificationService.CurrentNotification, Converter={x:Static ObjectConverters.IsNotNull}}"
+                Classes="toastContainer"
+                Classes.visible="{Binding NotificationService.IsNotificationVisible}">
+            
+            <Border Classes="toastPill"
+                    Background="{Binding NotificationService.CurrentNotification.Type, Converter={StaticResource TypeToBackgroundConverter}}">
+                
+                <StackPanel Orientation="Horizontal" 
+                            Spacing="10">
+                    
+                    <!-- Icon circle -->
+                    <Border Classes="toastIconCircle"
+                            Background="{Binding NotificationService.CurrentNotification.Type, Converter={StaticResource TypeToIconBackgroundConverter}}">
+                        <TextBlock Text="{Binding NotificationService.CurrentNotification.Icon}"
+                                   Classes="toastIcon"
+                                   Foreground="{Binding NotificationService.CurrentNotification.Type, Converter={StaticResource TypeToForegroundConverter}}"/>
+                    </Border>
+                    
+                    <!-- Message text -->
+                    <TextBlock Text="{Binding NotificationService.CurrentNotification.Message}"
+                               Classes="toastMessage"
+                               Foreground="{Binding NotificationService.CurrentNotification.Type, Converter={StaticResource TypeToForegroundConverter}}"
+                               MaxWidth="400"
+                               TextTrimming="CharacterEllipsis"/>
+                    
+                </StackPanel>
+            </Border>
+        </Border>
+    </Panel>
+    
+</UserControl>

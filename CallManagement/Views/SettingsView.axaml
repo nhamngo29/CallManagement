@@ -30,7 +30,7 @@
             <StackPanel Spacing="4">
                 <TextBlock Classes="heading2" Text="⚙️ Settings"/>
                 <TextBlock Classes="bodySecondary" 
-                           Text="Quản lý cài đặt bảo mật và Telegram Bot"/>
+                           Text="Quản lý giao diện, bảo mật và Telegram Bot"/>
             </StackPanel>
             
             <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -46,31 +46,86 @@
                 </Border.Background>
                 <Border.Styles>
                     <Style Selector="Border[Tag=success]">
-                        <Setter Property="Background" Value="{StaticResource SuccessLightBrush}"/>
+                        <Setter Property="Background" Value="{DynamicResource SuccessLightBrush}"/>
                     </Style>
                 </Border.Styles>
                 <Panel>
                     <!-- Success Background -->
                     <Border IsVisible="{Binding IsStatusSuccess}"
-                            Background="{StaticResource SuccessLightBrush}"
+                            Background="{DynamicResource SuccessLightBrush}"
                             CornerRadius="8"
                             Margin="-12"
                             Padding="12">
                         <TextBlock Text="{Binding StatusMessage}"
-                                   Foreground="{StaticResource SuccessTextBrush}"
+                                   Foreground="{DynamicResource SuccessTextBrush}"
                                    FontWeight="Medium"/>
                     </Border>
                     <!-- Error Background -->
                     <Border IsVisible="{Binding !IsStatusSuccess}"
-                            Background="{StaticResource ErrorLightBrush}"
+                            Background="{DynamicResource ErrorLightBrush}"
                             CornerRadius="8"
                             Margin="-12"
                             Padding="12">
                         <TextBlock Text="{Binding StatusMessage}"
-                                   Foreground="{StaticResource ErrorTextBrush}"
+                                   Foreground="{DynamicResource ErrorTextBrush}"
                                    FontWeight="Medium"/>
                     </Border>
                 </Panel>
+            </Border>
+            
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- APPEARANCE SECTION (Theme) -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <Border Classes="card" Padding="20" CornerRadius="12">
+                <StackPanel Spacing="16">
+                    
+                    <!-- Section Header -->
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="🎨" FontSize="20"/>
+                        <TextBlock Classes="heading3" Text="Appearance" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <Border Height="1" Background="{DynamicResource BorderLightBrush}" Margin="0,4"/>
+                    
+                    <!-- Theme Selection -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Classes="body" Text="Theme" FontWeight="Medium"/>
+                            <TextBlock Classes="caption" Text="Chọn giao diện sáng, tối hoặc theo hệ thống" 
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                        <ComboBox Grid.Column="1"
+                                  Width="180"
+                                  ItemsSource="{Binding ThemeModeOptions}"
+                                  SelectedValue="{Binding SelectedThemeMode}"
+                                  SelectedValueBinding="{Binding Mode}"
+                                  HorizontalAlignment="Right">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+                    
+                    <!-- Theme Info -->
+                    <Border Background="{DynamicResource NeutralLightBrush}"
+                            CornerRadius="8"
+                            Padding="12">
+                        <StackPanel Spacing="4">
+                            <TextBlock Classes="caption" FontWeight="SemiBold" Text="💡 Ghi chú"/>
+                            <TextBlock Classes="caption" 
+                                       TextWrapping="Wrap"
+                                       Foreground="{DynamicResource TextSecondaryBrush}">
+                                <Run Text="• System: Tự động theo cài đặt hệ điều hành"/>
+                                <LineBreak/>
+                                <Run Text="• Thay đổi được áp dụng ngay lập tức"/>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
             </Border>
             
             <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -85,15 +140,15 @@
                         <TextBlock Classes="heading3" Text="Security" VerticalAlignment="Center"/>
                     </StackPanel>
                     
-                    <Border Height="1" Background="{StaticResource BorderLightBrush}" Margin="0,4"/>
+                    <Border Height="1" Background="{DynamicResource BorderLightBrush}" Margin="0,4"/>
                     
                     <!-- Unlocked State -->
                     <StackPanel IsVisible="{Binding IsUnlocked}" Spacing="12">
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="✔️" FontSize="16" Foreground="{StaticResource SuccessTextBrush}"/>
+                            <TextBlock Text="✔️" FontSize="16" Foreground="{DynamicResource SuccessTextBrush}"/>
                             <TextBlock Text="Settings unlocked" 
                                        Classes="body"
-                                       Foreground="{StaticResource SuccessTextBrush}"
+                                       Foreground="{DynamicResource SuccessTextBrush}"
                                        FontWeight="Medium"/>
                         </StackPanel>
                         
@@ -136,7 +191,7 @@
                             <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                                        IsVisible="{Binding ShowPasswordError}"
                                        Text="{Binding PasswordError}"
-                                       Foreground="{StaticResource ErrorTextBrush}"
+                                       Foreground="{DynamicResource ErrorTextBrush}"
                                        FontSize="12"
                                        Margin="0,8,0,0"/>
                         </Grid>
@@ -169,17 +224,17 @@
                         <TextBlock Classes="heading3" Text="Telegram Bot" VerticalAlignment="Center"/>
                     </StackPanel>
                     
-                    <Border Height="1" Background="{StaticResource BorderLightBrush}" Margin="0,4"/>
+                    <Border Height="1" Background="{DynamicResource BorderLightBrush}" Margin="0,4"/>
                     
                     <!-- Locked Message -->
                     <Border IsVisible="{Binding !IsUnlocked}"
-                            Background="{StaticResource WarningLightBrush}"
+                            Background="{DynamicResource WarningLightBrush}"
                             CornerRadius="8"
                             Padding="12">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="🔒" FontSize="14"/>
                             <TextBlock Text="Vui lòng unlock để truy cập cài đặt này"
-                                       Foreground="{StaticResource WarningTextBrush}"
+                                       Foreground="{DynamicResource WarningTextBrush}"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
@@ -195,7 +250,7 @@
                                      Classes="settingsInput"/>
                             <TextBlock IsVisible="{Binding ShowBotTokenError}"
                                        Text="{Binding BotTokenError}"
-                                       Foreground="{StaticResource ErrorTextBrush}"
+                                       Foreground="{DynamicResource ErrorTextBrush}"
                                        FontSize="12"/>
                         </StackPanel>
                         
@@ -207,19 +262,19 @@
                                      Classes="settingsInput"/>
                             <TextBlock IsVisible="{Binding ShowChatIdError}"
                                        Text="{Binding ChatIdError}"
-                                       Foreground="{StaticResource ErrorTextBrush}"
+                                       Foreground="{DynamicResource ErrorTextBrush}"
                                        FontSize="12"/>
                         </StackPanel>
                         
                         <!-- Help Text -->
-                        <Border Background="{StaticResource NeutralLightBrush}"
+                        <Border Background="{DynamicResource NeutralLightBrush}"
                                 CornerRadius="8"
                                 Padding="12">
                             <StackPanel Spacing="4">
                                 <TextBlock Classes="caption" FontWeight="SemiBold" Text="💡 Hướng dẫn"/>
                                 <TextBlock Classes="caption" 
                                            TextWrapping="Wrap"
-                                           Foreground="{StaticResource TextSecondaryBrush}">
+                                           Foreground="{DynamicResource TextSecondaryBrush}">
                                     <Run Text="1. Tạo bot tại @BotFather trên Telegram"/>
                                     <LineBreak/>
                                     <Run Text="2. Copy Bot Token từ BotFather"/>
@@ -258,9 +313,103 @@
             </Border>
             
             <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- DAILY REPORT SECTION -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <Border Classes="card" Padding="20" CornerRadius="12"
+                    Opacity="{Binding IsUnlocked, Converter={StaticResource BoolToOpacity}}">
+                <StackPanel Spacing="16">
+                    
+                    <!-- Section Header -->
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="📊" FontSize="20"/>
+                        <TextBlock Classes="heading3" Text="Daily Report" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <Border Height="1" Background="{DynamicResource BorderLightBrush}" Margin="0,4"/>
+                    
+                    <!-- Locked Message -->
+                    <Border IsVisible="{Binding !IsUnlocked}"
+                            Background="{DynamicResource WarningLightBrush}"
+                            CornerRadius="8"
+                            Padding="12">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="🔒" FontSize="14"/>
+                            <TextBlock Text="Vui lòng unlock để truy cập cài đặt này"
+                                       Foreground="{DynamicResource WarningTextBrush}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Daily Report Settings -->
+                    <StackPanel IsVisible="{Binding IsUnlocked}" Spacing="16">
+                        
+                        <!-- Enable Auto Send Toggle -->
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Classes="body" Text="Tự động gửi Daily Report" FontWeight="Medium"/>
+                                <TextBlock Classes="caption" Text="Gửi báo cáo tự động theo giờ cấu hình" 
+                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1" 
+                                          IsChecked="{Binding EnableAutoSendDailyReport, Mode=TwoWay}"
+                                          OnContent="Bật"
+                                          OffContent="Tắt"/>
+                        </Grid>
+                        
+                        <!-- Send Time Picker -->
+                        <StackPanel Spacing="6" IsEnabled="{Binding EnableAutoSendDailyReport}">
+                            <TextBlock Classes="body" Text="Giờ gửi báo cáo" FontWeight="Medium"/>
+                            <Grid ColumnDefinitions="Auto,Auto,Auto,*">
+                                <ComboBox Grid.Column="0"
+                                          Width="80"
+                                          SelectedItem="{Binding SelectedHour, Mode=TwoWay}"
+                                          ItemsSource="{Binding AvailableHours}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding StringFormat={}{0:D2}}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <TextBlock Grid.Column="1" Text=":" FontSize="20" FontWeight="Bold"
+                                           VerticalAlignment="Center" Margin="8,0"/>
+                                <ComboBox Grid.Column="2"
+                                          Width="80"
+                                          SelectedItem="{Binding SelectedMinute, Mode=TwoWay}"
+                                          ItemsSource="{Binding AvailableMinutes}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding StringFormat={}{0:D2}}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+                        </StackPanel>
+                        
+                        <!-- Info Box -->
+                        <Border Background="{DynamicResource NeutralLightBrush}"
+                                CornerRadius="8"
+                                Padding="12">
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="caption" FontWeight="SemiBold" Text="💡 Ghi chú"/>
+                                <TextBlock Classes="caption" 
+                                           TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextSecondaryBrush}">
+                                    <Run Text="• Daily Report tổng hợp cuộc gọi trong ngày"/>
+                                    <LineBreak/>
+                                    <Run Text="• Chỉ gửi khi app đang chạy"/>
+                                    <LineBreak/>
+                                    <Run Text="• Mỗi ngày chỉ gửi 1 lần"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            
+            <!-- ═══════════════════════════════════════════════════════════════ -->
             <!-- FOOTER INFO -->
             <!-- ═══════════════════════════════════════════════════════════════ -->
-            <Border Background="{StaticResource NeutralLightBrush}"
+            <Border Background="{DynamicResource NeutralLightBrush}"
                     CornerRadius="8"
                     Padding="16">
                 <StackPanel Spacing="8">
@@ -269,7 +418,7 @@
                                Text="🛡️ Thông tin bảo mật"/>
                     <TextBlock Classes="caption" 
                                TextWrapping="Wrap"
-                               Foreground="{StaticResource TextSecondaryBrush}">
+                               Foreground="{DynamicResource TextSecondaryBrush}">
                         <Run Text="• Mật khẩu được mã hóa SHA-256, không lưu plain text"/>
                         <LineBreak/>
                         <Run Text="• Cài đặt Telegram được lưu cục bộ trên máy"/>

@@ -13,7 +13,7 @@
         Title="Call Manager"
         MinWidth="900"
         MinHeight="600"
-        Background="{StaticResource AppBackgroundBrush}">
+        Background="{DynamicResource AppBackgroundBrush}">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
@@ -35,6 +35,7 @@
         <conv:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
         <conv:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
         <conv:BoolToSavingTextConverter x:Key="BoolToSavingTextConverter"/>
+        <conv:StringNotEmptyConverter x:Key="StringNotEmpty"/>
     </Window.Resources>
 
     <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -46,8 +47,8 @@
         <!-- TOP BAR -->
         <!-- ═══════════════════════════════════════════════════════════════════ -->
         <Border Grid.Row="0"
-                Background="{StaticResource TopBarBackgroundBrush}"
-                BorderBrush="{StaticResource BorderLightBrush}"
+                Background="{DynamicResource TopBarBackgroundBrush}"
+                BorderBrush="{DynamicResource BorderLightBrush}"
                 BorderThickness="0,0,0,1"
                 Padding="20,12">
             <Grid ColumnDefinitions="Auto,*,Auto">
@@ -55,7 +56,7 @@
                 <!-- Logo + App Name -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                     <!-- App Icon -->
-                    <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource PrimaryBrush}">
+                    <Border Width="36" Height="36" CornerRadius="8" Background="{DynamicResource PrimaryBrush}">
                         <TextBlock Text="📞" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <TextBlock Classes="appTitle" Text="Call Manager" VerticalAlignment="Center"/>
@@ -90,23 +91,40 @@
                     <Button Classes="topBarButton"
                             x:Name="SendReportButton"
                             Command="{Binding OpenSendReportCommand}"
-                            IsEnabled="{Binding IsTelegramConfigured}">
-                        <Button.Styles>
-                            <Style Selector="Button:disabled">
-                                <Setter Property="ToolTip.Tip" Value="Configure Telegram Bot in Settings first"/>
-                            </Style>
-                            <Style Selector="Button:enabled">
-                                <Setter Property="ToolTip.Tip" Value="Gửi báo cáo Excel qua Telegram"/>
-                            </Style>
-                        </Button.Styles>
+                            ToolTip.Tip="Gửi báo cáo Excel qua Telegram">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="📨" FontSize="16"/>
                             <TextBlock Text="Send Report" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     
+                    <!-- Send Daily Report Button - Always visible, can send manual anytime -->
+                    <Button Classes="topBarButton"
+                            x:Name="SendDailyReportButton"
+                            Command="{Binding SendDailyReportCommand}"
+                            ToolTip.Tip="Gửi Daily Report qua Telegram (Manual)">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="📊" FontSize="16"/>
+                            <TextBlock Text="Daily Report" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <!-- Auto Daily Report Indicator - Shown when auto-send is enabled -->
+                    <Border IsVisible="{Binding IsAutoSendDailyReportEnabled}"
+                            Background="{DynamicResource SuccessLightBrush}"
+                            CornerRadius="6"
+                            Padding="8,4"
+                            VerticalAlignment="Center"
+                            ToolTip.Tip="Auto-send đang bật. Daily Report sẽ được gửi tự động theo giờ cấu hình.">
+                        <TextBlock Text="⏰ Auto" 
+                                   FontSize="11" 
+                                   FontWeight="Medium"
+                                   Foreground="{DynamicResource SuccessTextBrush}"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                    
                     <!-- Separator -->
-                    <Border Width="1" Height="24" Background="{StaticResource BorderLightBrush}" Margin="8,0"/>
+                    <Border Width="1" Height="24" Background="{DynamicResource BorderLightBrush}" Margin="8,0"/>
                     
                     <!-- Save Session Button -->
                     <Button Classes="topBarButton primary"
@@ -131,7 +149,7 @@
                     </Button>
                     
                     <!-- Separator -->
-                    <Border Width="1" Height="24" Background="{StaticResource BorderLightBrush}" Margin="8,0"/>
+                    <Border Width="1" Height="24" Background="{DynamicResource BorderLightBrush}" Margin="8,0"/>
                     
                     <!-- Help Button -->
                     <Button Classes="iconButton"
@@ -155,7 +173,7 @@
         <!-- ═══════════════════════════════════════════════════════════════════ -->
         <Border Grid.Row="0" Grid.RowSpan="2"
                 IsVisible="{Binding IsLoading}"
-                Background="{StaticResource OverlayBackgroundBrush}"
+                Background="{DynamicResource OverlayBackgroundBrush}"
                 ZIndex="100">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
                 <TextBlock Text="⏳" FontSize="48" HorizontalAlignment="Center"/>
@@ -174,8 +192,8 @@
             <!-- SIDEBAR -->
             <!-- ═══════════════════════════════════════════════════════════════ -->
             <Border Grid.Column="0"
-                    Background="{StaticResource SidebarBackgroundBrush}"
-                    BorderBrush="{StaticResource BorderLightBrush}"
+                    Background="{DynamicResource SidebarBackgroundBrush}"
+                    BorderBrush="{DynamicResource BorderLightBrush}"
                     BorderThickness="0,0,1,0"
                     IsVisible="{Binding IsSidebarVisible}">
                 <Grid RowDefinitions="Auto,*,Auto">
@@ -185,7 +203,7 @@
                     <!-- ═══════════════════════════════════════════════════════ -->
                     <Border Grid.Row="0" 
                             Padding="16,12"
-                            BorderBrush="{StaticResource BorderLightBrush}"
+                            BorderBrush="{DynamicResource BorderLightBrush}"
                             BorderThickness="0,0,0,1">
                         <Grid ColumnDefinitions="*,Auto">
                             <TextBlock Classes="heading3" Text="📂 Sessions" VerticalAlignment="Center"/>
@@ -218,13 +236,13 @@
                                 <Setter Property="Cursor" Value="Hand"/>
                             </Style>
                             <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                                <Setter Property="Background" Value="{StaticResource NeutralLightBrush}"/>
+                                <Setter Property="Background" Value="{DynamicResource NeutralLightBrush}"/>
                             </Style>
                             <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                                <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                                <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
                             </Style>
                             <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter">
-                                <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
+                                <Setter Property="Background" Value="{DynamicResource PrimaryHoverBrush}"/>
                             </Style>
                         </ListBox.Styles>
                         
@@ -249,13 +267,13 @@
                                     <!-- Contact Count Badge -->
                                     <Border Grid.Column="2"
                                             IsVisible="{Binding !IsCurrent}"
-                                            Background="{StaticResource NeutralLightBrush}"
+                                            Background="{DynamicResource NeutralLightBrush}"
                                             CornerRadius="10"
                                             Padding="6,2"
                                             VerticalAlignment="Center">
                                         <TextBlock Text="{Binding ContactCount}"
                                                    FontSize="11"
-                                                   Foreground="{StaticResource TextMutedBrush}"/>
+                                                   Foreground="{DynamicResource TextMutedBrush}"/>
                                     </Border>
                                 </Grid>
                             </DataTemplate>
@@ -266,44 +284,51 @@
                     <!-- STATISTICS PANEL (Bottom) -->
                     <!-- ═══════════════════════════════════════════════════════ -->
                     <Border Grid.Row="2"
-                            BorderBrush="{StaticResource BorderLightBrush}"
+                            BorderBrush="{DynamicResource BorderLightBrush}"
                             BorderThickness="0,1,0,0"
                             Padding="12">
                         <StackPanel Spacing="8">
                             <TextBlock Classes="caption" Text="📊 Statistics" FontWeight="SemiBold"/>
                             
-                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="0,4,0,0">
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Margin="0,4,0,0">
                                 <!-- Total -->
-                                <TextBlock Grid.Row="0" Grid.Column="0" Classes="caption" Text="Total" Foreground="{StaticResource TextMutedBrush}"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Classes="caption" Text="Total" Foreground="{DynamicResource TextMutedBrush}"/>
                                 <TextBlock Grid.Row="0" Grid.Column="1" Classes="body" Text="{Binding TotalCount}" FontWeight="SemiBold"/>
                                 
-                                <!-- Answered -->
+                                <!-- Interested (Có nhu cầu) -->
                                 <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
-                                    <Border Width="8" Height="8" CornerRadius="4" Background="{StaticResource SuccessBrush}" VerticalAlignment="Center"/>
-                                    <TextBlock Classes="caption" Text="Nghe máy" Foreground="{StaticResource TextMutedBrush}"/>
+                                    <Border Width="8" Height="8" CornerRadius="4" Background="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Classes="caption" Text="Có nhu cầu" Foreground="{DynamicResource TextMutedBrush}"/>
                                 </StackPanel>
-                                <TextBlock Grid.Row="1" Grid.Column="1" Classes="body" Text="{Binding AnsweredCount}" Foreground="{StaticResource SuccessTextBrush}" Margin="0,4,0,0"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Classes="body" Text="{Binding InterestedCount}" Foreground="{DynamicResource SuccessTextBrush}" Margin="0,4,0,0"/>
                                 
-                                <!-- No Answer -->
+                                <!-- Not Interested (Không nhu cầu) -->
                                 <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
-                                    <Border Width="8" Height="8" CornerRadius="4" Background="{StaticResource NeutralBrush}" VerticalAlignment="Center"/>
-                                    <TextBlock Classes="caption" Text="Không nghe" Foreground="{StaticResource TextMutedBrush}"/>
+                                    <Border Width="8" Height="8" CornerRadius="4" Background="{DynamicResource ErrorBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Classes="caption" Text="Không nhu cầu" Foreground="{DynamicResource TextMutedBrush}"/>
                                 </StackPanel>
-                                <TextBlock Grid.Row="2" Grid.Column="1" Classes="body" Text="{Binding NoAnswerCount}" Foreground="{StaticResource NeutralTextBrush}" Margin="0,4,0,0"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Classes="body" Text="{Binding NotInterestedCount}" Foreground="{DynamicResource ErrorTextBrush}" Margin="0,4,0,0"/>
                                 
-                                <!-- Invalid -->
+                                <!-- No Answer (Không bắt máy) -->
                                 <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
-                                    <Border Width="8" Height="8" CornerRadius="4" Background="{StaticResource ErrorBrush}" VerticalAlignment="Center"/>
-                                    <TextBlock Classes="caption" Text="Số sai" Foreground="{StaticResource TextMutedBrush}"/>
+                                    <Border Width="8" Height="8" CornerRadius="4" Background="{DynamicResource NeutralBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Classes="caption" Text="Không bắt máy" Foreground="{DynamicResource TextMutedBrush}"/>
                                 </StackPanel>
-                                <TextBlock Grid.Row="3" Grid.Column="1" Classes="body" Text="{Binding InvalidCount}" Foreground="{StaticResource ErrorTextBrush}" Margin="0,4,0,0"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Classes="body" Text="{Binding NoAnswerCount}" Foreground="{DynamicResource NeutralTextBrush}" Margin="0,4,0,0"/>
                                 
-                                <!-- Busy -->
+                                <!-- Busy (Máy bận) -->
                                 <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
-                                    <Border Width="8" Height="8" CornerRadius="4" Background="{StaticResource WarningBrush}" VerticalAlignment="Center"/>
-                                    <TextBlock Classes="caption" Text="Máy bận" Foreground="{StaticResource TextMutedBrush}"/>
+                                    <Border Width="8" Height="8" CornerRadius="4" Background="{DynamicResource WarningBrush}" VerticalAlignment="Center"/>
+                                    <TextBlock Classes="caption" Text="Máy bận" Foreground="{DynamicResource TextMutedBrush}"/>
                                 </StackPanel>
-                                <TextBlock Grid.Row="4" Grid.Column="1" Classes="body" Text="{Binding BusyCount}" Foreground="{StaticResource WarningTextBrush}" Margin="0,4,0,0"/>
+                                <TextBlock Grid.Row="4" Grid.Column="1" Classes="body" Text="{Binding BusyCount}" Foreground="{DynamicResource WarningTextBrush}" Margin="0,4,0,0"/>
+                                
+                                <!-- Invalid Number (Số không tồn tại) -->
+                                <StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                                    <Border Width="8" Height="8" CornerRadius="4" Background="#7F1D1D" VerticalAlignment="Center"/>
+                                    <TextBlock Classes="caption" Text="Số không tồn tại" Foreground="{DynamicResource TextMutedBrush}"/>
+                                </StackPanel>
+                                <TextBlock Grid.Row="5" Grid.Column="1" Classes="body" Text="{Binding InvalidCount}" Foreground="#7F1D1D" Margin="0,4,0,0"/>
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -339,14 +364,14 @@
                                     
                                     <!-- Contact Count Badge -->
                                     <Border Grid.Column="1"
-                                            Background="{StaticResource NeutralLightBrush}"
+                                            Background="{DynamicResource NeutralLightBrush}"
                                             CornerRadius="8"
                                             Padding="6,2"
                                             Margin="8,0,0,0"
                                             VerticalAlignment="Center">
                                         <TextBlock Text="{Binding Contacts.Count}"
                                                    FontSize="10"
-                                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </Border>
                                     
                                     <!-- Close Button (only for history tabs) -->
@@ -368,14 +393,14 @@
                         <TabControl.ContentTemplate>
                             <DataTemplate x:DataType="vm:SessionTabViewModel">
                                 <Border Classes="card" Padding="0" ClipToBounds="True" Margin="0,12,0,0">
-                                    <Grid RowDefinitions="Auto,Auto,*">
+                                    <Grid RowDefinitions="Auto,Auto,Auto,*">
                                         
                                         <!-- Session Info Bar (for history tabs) -->
                                         <Border Grid.Row="0"
                                                 IsVisible="{Binding IsCurrentSession, Converter={StaticResource InverseBool}}"
-                                                Background="{StaticResource WarningLightBrush}"
+                                                Background="{DynamicResource WarningLightBrush}"
                                                 Padding="12,8"
-                                                BorderBrush="{StaticResource BorderLightBrush}"
+                                                BorderBrush="{DynamicResource BorderLightBrush}"
                                                 BorderThickness="0,0,0,1">
                                             <Grid ColumnDefinitions="*,Auto">
                                                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
@@ -387,7 +412,7 @@
                                                     <TextBlock Text="•" VerticalAlignment="Center" Margin="8,0"/>
                                                     <TextBlock Text="Chỉ xem (Read-only)" 
                                                                FontStyle="Italic"
-                                                               Foreground="{StaticResource TextMutedBrush}"
+                                                               Foreground="{DynamicResource TextMutedBrush}"
                                                                VerticalAlignment="Center"/>
                                                 </StackPanel>
                                                 
@@ -402,27 +427,236 @@
                                                 </Button>
                                             </Grid>
                                         </Border>
-                        
-                                        <!-- Table Header -->
-                                        <Border Grid.Row="1" 
-                                                Background="{StaticResource NeutralLightBrush}" 
-                                                Padding="16,12"
-                                                BorderBrush="{StaticResource BorderLightBrush}"
+                                        
+                                        <!-- ════════════════════════════════════════════════════════════════ -->
+                                        <!-- SEARCH / FILTER TOOLBAR -->
+                                        <!-- ════════════════════════════════════════════════════════════════ -->
+                                        <Border Grid.Row="1"
+                                                Background="{DynamicResource AppBackgroundBrush}"
+                                                Padding="16,10"
+                                                BorderBrush="{DynamicResource BorderLightBrush}"
                                                 BorderThickness="0,0,0,1">
-                                            <Grid ColumnDefinitions="50,*,140,140,100,140,140,50">
-                                                <TextBlock Grid.Column="0" Classes="caption" FontWeight="SemiBold" Text="#"/>
-                                                <TextBlock Grid.Column="1" Classes="caption" FontWeight="SemiBold" Text="Tên"/>
-                                                <TextBlock Grid.Column="2" Classes="caption" FontWeight="SemiBold" Text="Số điện thoại"/>
-                                                <TextBlock Grid.Column="3" Classes="caption" FontWeight="SemiBold" Text="Công ty"/>
-                                                <TextBlock Grid.Column="4" Classes="caption" FontWeight="SemiBold" Text="Ghi chú"/>
-                                                <TextBlock Grid.Column="5" Classes="caption" FontWeight="SemiBold" Text="Trạng thái"/>
-                                                <TextBlock Grid.Column="6" Classes="caption" FontWeight="SemiBold" Text="Hành động" HorizontalAlignment="Center"/>
-                                                <TextBlock Grid.Column="7" Classes="caption" FontWeight="SemiBold" Text="" ToolTip.Tip="Double-click để chỉnh sửa"/>
+                                            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" 
+                                                  RowDefinitions="36">
+                                                
+                                                <!-- Search Box Container -->
+                                                <Border Grid.Column="0"
+                                                        Background="{DynamicResource CardBackgroundBrush}"
+                                                        BorderBrush="{DynamicResource BorderMediumBrush}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="6"
+                                                        Height="36"
+                                                        MinWidth="320"
+                                                        MaxWidth="400"
+                                                        VerticalAlignment="Center">
+                                                    <Grid ColumnDefinitions="36,*,32">
+                                                        <!-- Search Icon -->
+                                                        <Border Grid.Column="0"
+                                                                Width="36" Height="36">
+                                                            <TextBlock Text="🔍" 
+                                                                       FontSize="14" 
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"
+                                                                       Opacity="0.5"/>
+                                                        </Border>
+                                                        
+                                                        <!-- Search TextBox -->
+                                                        <TextBox Grid.Column="1"
+                                                                 Text="{Binding SearchText, Mode=TwoWay}"
+                                                                 Watermark="Tìm tên, SĐT, công ty, ghi chú..."
+                                                                 Classes="searchInput"
+                                                                 BorderThickness="0"
+                                                                 Background="Transparent"
+                                                                 Height="34"
+                                                                 VerticalAlignment="Center"
+                                                                 VerticalContentAlignment="Center"
+                                                                 Padding="0,0,4,0"/>
+                                                        
+                                                        <!-- Clear Button -->
+                                                        <Border Grid.Column="2" 
+                                                                Width="32" Height="36"
+                                                                IsVisible="{Binding SearchText, Converter={StaticResource StringNotEmpty}}">
+                                                            <Button Classes="iconButton"
+                                                                    Width="28" Height="28"
+                                                                    HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center"
+                                                                    Command="{Binding ClearSearchCommand}"
+                                                                    ToolTip.Tip="Xóa tìm kiếm">
+                                                                <TextBlock Text="✕" 
+                                                                           FontSize="12" 
+                                                                           Opacity="0.5" 
+                                                                           HorizontalAlignment="Center" 
+                                                                           VerticalAlignment="Center"/>
+                                                            </Button>
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+                                                
+                                                <!-- Status Filter -->
+                                                <Grid Grid.Column="1" 
+                                                      ColumnDefinitions="Auto,Auto" 
+                                                      Margin="16,0,0,0"
+                                                      VerticalAlignment="Center">
+                                                    <TextBlock Grid.Column="0"
+                                                               Text="Lọc:" 
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                                               VerticalAlignment="Center"
+                                                               Margin="0,0,8,0"/>
+                                                    <ComboBox Grid.Column="1"
+                                                              ItemsSource="{Binding StatusFilterOptions}"
+                                                              SelectedItem="{Binding SelectedStatusFilter}"
+                                                              MinWidth="170"
+                                                              Height="36"
+                                                              VerticalAlignment="Center"
+                                                              VerticalContentAlignment="Center"
+                                                              Classes="filterComboBox">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:StatusFilterOption">
+                                                                <StackPanel Orientation="Horizontal" 
+                                                                            Spacing="8"
+                                                                            VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding Icon}" 
+                                                                               FontSize="14"
+                                                                               VerticalAlignment="Center"/>
+                                                                    <TextBlock Text="{Binding DisplayText}"
+                                                                               VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                </Grid>
+                                                
+                                                <!-- Spacer -->
+                                                <Border Grid.Column="2"/>
+                                                
+                                                <!-- Results Count Badge -->
+                                                <Border Grid.Column="3"
+                                                        Background="{DynamicResource NeutralLightBrush}"
+                                                        CornerRadius="18"
+                                                        Height="36"
+                                                        Padding="14,0"
+                                                        VerticalAlignment="Center">
+                                                    <TextBlock FontSize="12" 
+                                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                                               VerticalAlignment="Center">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding StringFormat="{}{0} / {1} contacts">
+                                                                <Binding Path="Contacts.Count"/>
+                                                                <Binding Path="AllContacts.Count"/>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </Border>
+                                                
+                                                <!-- Clear All Filters Button -->
+                                                <Border Grid.Column="4"
+                                                        Width="36" Height="36"
+                                                        Margin="8,0,0,0"
+                                                        VerticalAlignment="Center">
+                                                    <Button Classes="iconButton"
+                                                            Width="36" Height="36"
+                                                            Command="{Binding ClearAllFiltersCommand}"
+                                                            ToolTip.Tip="Xóa tất cả bộ lọc">
+                                                        <TextBlock Text="🔄" 
+                                                                   FontSize="14"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"/>
+                                                    </Button>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                        
+                                        <!-- Table Header with Sortable Columns -->
+                                        <Border Grid.Row="2" 
+                                                Background="{DynamicResource NeutralLightBrush}" 
+                                                Padding="16,8"
+                                                BorderBrush="{DynamicResource BorderLightBrush}"
+                                                BorderThickness="0,0,0,1">
+                                            <Grid ColumnDefinitions="50,*,140,140,100,140,220,50">
+                                                <!-- ID (not sortable) -->
+                                                <TextBlock Grid.Column="0" Classes="caption" FontWeight="SemiBold" Text="#" VerticalAlignment="Center"/>
+                                                
+                                                <!-- Name (sortable) -->
+                                                <Button Grid.Column="1" 
+                                                        Classes="sortableHeader"
+                                                        Command="{Binding SortByNameCommand}"
+                                                        HorizontalAlignment="Left"
+                                                        ToolTip.Tip="Click để sắp xếp theo tên">
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <TextBlock Classes="caption" FontWeight="SemiBold" Text="Tên"/>
+                                                        <TextBlock Classes="sortIcon" Text="{Binding NameSortIcon}" FontSize="10" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                                
+                                                <!-- Phone (sortable) -->
+                                                <Button Grid.Column="2" 
+                                                        Classes="sortableHeader"
+                                                        Command="{Binding SortByPhoneCommand}"
+                                                        HorizontalAlignment="Left"
+                                                        ToolTip.Tip="Click để sắp xếp theo SĐT">
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <TextBlock Classes="caption" FontWeight="SemiBold" Text="Số điện thoại"/>
+                                                        <TextBlock Classes="sortIcon" Text="{Binding PhoneSortIcon}" FontSize="10" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                                
+                                                <!-- Company (sortable) -->
+                                                <Button Grid.Column="3" 
+                                                        Classes="sortableHeader"
+                                                        Command="{Binding SortByCompanyCommand}"
+                                                        HorizontalAlignment="Left"
+                                                        ToolTip.Tip="Click để sắp xếp theo công ty">
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <TextBlock Classes="caption" FontWeight="SemiBold" Text="Công ty"/>
+                                                        <TextBlock Classes="sortIcon" Text="{Binding CompanySortIcon}" FontSize="10" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                                
+                                                <!-- Note (not sortable) -->
+                                                <TextBlock Grid.Column="4" Classes="caption" FontWeight="SemiBold" Text="Ghi chú" VerticalAlignment="Center"/>
+                                                
+                                                <!-- Status (sortable) -->
+                                                <Button Grid.Column="5" 
+                                                        Classes="sortableHeader"
+                                                        Command="{Binding SortByStatusCommand}"
+                                                        HorizontalAlignment="Left"
+                                                        ToolTip.Tip="Click để sắp xếp theo trạng thái">
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <TextBlock Classes="caption" FontWeight="SemiBold" Text="Trạng thái"/>
+                                                        <TextBlock Classes="sortIcon" Text="{Binding StatusSortIcon}" FontSize="10" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                                
+                                                <!-- Actions (not sortable) -->
+                                                <TextBlock Grid.Column="6" Classes="caption" FontWeight="SemiBold" Text="Hành động" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="7" Classes="caption" FontWeight="SemiBold" Text="" VerticalAlignment="Center"/>
                                             </Grid>
                                         </Border>
                         
                                         <!-- Table Content -->
-                                        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                                        <Grid Grid.Row="3">
+                                            <!-- No Results Message -->
+                                            <Border IsVisible="{Binding HasNoResults}"
+                                                    Padding="40"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center">
+                                                <StackPanel Spacing="12" HorizontalAlignment="Center">
+                                                    <TextBlock Text="🔍" FontSize="48" HorizontalAlignment="Center" Opacity="0.5"/>
+                                                    <TextBlock Text="{Binding NoResultsMessage}" 
+                                                               Classes="bodySecondary"
+                                                               HorizontalAlignment="Center"/>
+                                                    <Button Classes="secondary"
+                                                            Content="Xóa bộ lọc"
+                                                            Command="{Binding ClearAllFiltersCommand}"
+                                                            HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Border>
+                                            
+                                            <!-- Contacts List -->
+                                            <ScrollViewer HorizontalScrollBarVisibility="Auto" 
+                                                          VerticalScrollBarVisibility="Auto"
+                                                          IsVisible="{Binding HasNoResults, Converter={StaticResource InverseBool}}">
                                             <ItemsControl ItemsSource="{Binding Contacts}" x:Name="ContactsGrid">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate x:DataType="models:Contact">
@@ -438,7 +672,7 @@
                                                                         DoubleTapped="OnRowDoubleTapped"
                                                                         ToolTip.Tip="Double-click để chỉnh sửa">
                                                     
-                                                                    <Grid ColumnDefinitions="50,*,140,140,100,140,140,50" VerticalAlignment="Center">
+                                                                    <Grid ColumnDefinitions="50,*,140,140,100,140,220,50" VerticalAlignment="Center">
                                                                         <!-- ID -->
                                                         <TextBlock Grid.Column="0" 
                                                                    Classes="bodySecondary" 
@@ -457,7 +691,7 @@
                                                             <TextBlock Classes="monospace" 
                                                                        Text="{Binding PhoneNumber}" 
                                                                        VerticalAlignment="Center"
-                                                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
                                                             <Button Classes="iconButton"
                                                                     Width="24" Height="24"
                                                                     Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CopyPhoneNumberCommand}"
@@ -486,13 +720,13 @@
                                                                 <!-- No note placeholder -->
                                                                 <TextBlock Text="Thêm..."
                                                                            FontSize="11"
-                                                                           Foreground="{StaticResource TextMutedBrush}"
+                                                                           Foreground="{DynamicResource TextMutedBrush}"
                                                                            VerticalAlignment="Center"
                                                                            IsVisible="{Binding HasNote, Converter={StaticResource InverseBool}}"/>
                                                                 <!-- Note preview -->
                                                                 <TextBlock Text="{Binding NotePreview}"
                                                                            FontSize="11"
-                                                                           Foreground="{StaticResource WarningTextBrush}"
+                                                                           Foreground="{DynamicResource WarningTextBrush}"
                                                                            VerticalAlignment="Center"
                                                                            MaxWidth="60"
                                                                            TextTrimming="CharacterEllipsis"
@@ -513,63 +747,72 @@
                                                                        Foreground="{Binding Status, Converter={StaticResource StatusToForeground}}"/>
                                                         </Border>
                                                         
-                                                        <!-- Action Buttons -->
-                                                        <StackPanel Grid.Column="6" 
-                                                                    Orientation="Horizontal" 
-                                                                    Spacing="2" 
-                                                                    HorizontalAlignment="Center"
-                                                                    VerticalAlignment="Center">
+                                                        <!-- Action Buttons - Grid layout for clear spacing -->
+                                                        <Grid Grid.Column="6" 
+                                                              ColumnDefinitions="36,36,36,36,36,36"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center">
                                                             
-                                                            <!-- Answered Button -->
-                                                            <Button Classes="iconButton success"
-                                                                    Width="30" Height="30"
-                                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetAnsweredCommand}"
+                                                            <!-- Interested Button (Có nhu cầu) -->
+                                                            <Button Grid.Column="0"
+                                                                    Classes="actionIconButton success"
+                                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetInterestedCommand}"
                                                                     CommandParameter="{Binding}"
                                                                     IsEnabled="{Binding IsActionsEnabled}"
-                                                                    ToolTip.Tip="Đánh dấu: Nghe máy">
-                                                                <TextBlock Text="📞" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                    ToolTip.Tip="Có nhu cầu">
+                                                                <TextBlock Text="👍" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                             </Button>
                                                             
-                                                            <!-- No Answer Button -->
-                                                            <Button Classes="iconButton neutral"
-                                                                    Width="30" Height="30"
+                                                            <!-- Not Interested Button (Không nhu cầu) -->
+                                                            <Button Grid.Column="1"
+                                                                    Classes="actionIconButton error"
+                                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetNotInterestedCommand}"
+                                                                    CommandParameter="{Binding}"
+                                                                    IsEnabled="{Binding IsActionsEnabled}"
+                                                                    ToolTip.Tip="Không nhu cầu">
+                                                                <TextBlock Text="👎" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Button>
+                                                            
+                                                            <!-- No Answer Button (Không bắt máy) -->
+                                                            <Button Grid.Column="2"
+                                                                    Classes="actionIconButton neutral"
                                                                     Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetNoAnswerCommand}"
                                                                     CommandParameter="{Binding}"
                                                                     IsEnabled="{Binding IsActionsEnabled}"
-                                                                    ToolTip.Tip="Đánh dấu: Không nghe máy">
-                                                                <TextBlock Text="🔕" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                    ToolTip.Tip="Không bắt máy">
+                                                                <TextBlock Text="🔕" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                             </Button>
                                                             
-                                                            <!-- Invalid Number Button -->
-                                                            <Button Classes="iconButton error"
-                                                                    Width="30" Height="30"
-                                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetInvalidNumberCommand}"
-                                                                    CommandParameter="{Binding}"
-                                                                    IsEnabled="{Binding IsActionsEnabled}"
-                                                                    ToolTip.Tip="Đánh dấu: Số sai">
-                                                                <TextBlock Text="🚫" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                            </Button>
-                                                            
-                                                            <!-- Busy Button -->
-                                                            <Button Classes="iconButton warning"
-                                                                    Width="30" Height="30"
+                                                            <!-- Busy Button (Máy bận) -->
+                                                            <Button Grid.Column="3"
+                                                                    Classes="actionIconButton warning"
                                                                     Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetBusyCommand}"
                                                                     CommandParameter="{Binding}"
                                                                     IsEnabled="{Binding IsActionsEnabled}"
-                                                                    ToolTip.Tip="Đánh dấu: Máy bận">
-                                                                <TextBlock Text="⏳" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                    ToolTip.Tip="Máy bận">
+                                                                <TextBlock Text="⏳" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Button>
+                                                            
+                                                            <!-- Invalid Number Button (Số không tồn tại) -->
+                                                            <Button Grid.Column="4"
+                                                                    Classes="actionIconButton danger"
+                                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SetInvalidNumberCommand}"
+                                                                    CommandParameter="{Binding}"
+                                                                    IsEnabled="{Binding IsActionsEnabled}"
+                                                                    ToolTip.Tip="Số không tồn tại">
+                                                                <TextBlock Text="🚫" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                             </Button>
                                                             
                                                             <!-- Reset Button -->
-                                                            <Button Classes="iconButton"
-                                                                    Width="30" Height="30"
+                                                            <Button Grid.Column="5"
+                                                                    Classes="actionIconButton reset"
                                                                     Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ResetStatusCommand}"
                                                                     CommandParameter="{Binding}"
                                                                     IsVisible="{Binding IsActionsEnabled, Converter={StaticResource InverseBool}}"
                                                                     ToolTip.Tip="Đặt lại trạng thái">
-                                                                <TextBlock Text="↩️" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                <TextBlock Text="↩️" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                             </Button>
-                                                        </StackPanel>
+                                                        </Grid>
                                                         
                                                         <!-- Edit Button -->
                                                         <Button Grid.Column="7"
@@ -594,7 +837,7 @@
                                                     
                                                     <StackPanel Spacing="12">
                                                         <!-- Edit Fields Row -->
-                                                        <Grid ColumnDefinitions="50,*,140,140,100,140,140,50" VerticalAlignment="Center">
+                                                        <Grid ColumnDefinitions="50,*,140,140,100,140,220,50" VerticalAlignment="Center">
                                                             <!-- ID (readonly) -->
                                                             <TextBlock Grid.Column="0" 
                                                                        Classes="bodySecondary" 
@@ -699,7 +942,7 @@
                                                                 <TextBlock Text="📝 Ghi chú cuộc gọi" 
                                                                            FontWeight="SemiBold" 
                                                                            FontSize="12"
-                                                                           Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
                                                                 <TextBox Classes="noteTextArea"
                                                                          Text="{Binding EditNote, Mode=TwoWay}"
                                                                          x:Name="NoteTextBox"
@@ -709,7 +952,7 @@
                                                                 <StackPanel Spacing="4">
                                                                     <TextBlock Text="⚡ Ghi chú nhanh:" 
                                                                                FontSize="11" 
-                                                                               Foreground="{StaticResource TextMutedBrush}"/>
+                                                                               Foreground="{DynamicResource TextMutedBrush}"/>
                                                                     <WrapPanel>
                                                                         <Button Classes="quickNoteBtn"
                                                                                 Content="📞 Khách hẹn gọi lại"
@@ -742,7 +985,7 @@
                                                                     <TextBlock x:Name="NoteHintText"
                                                                                Text="💡 ⌘+Enter (Mac) / Ctrl+Enter (Win) để lưu, Esc để hủy" 
                                                                                FontSize="11" 
-                                                                               Foreground="{StaticResource TextMutedBrush}"
+                                                                               Foreground="{DynamicResource TextMutedBrush}"
                                                                                VerticalAlignment="Center"/>
                                                                 </StackPanel>
                                                             </StackPanel>
@@ -755,6 +998,7 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </ScrollViewer>
+                                        </Grid>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -770,8 +1014,8 @@
         <Grid Grid.Row="0" Grid.RowSpan="2"
               IsVisible="{Binding ShowDeleteConfirmation}"
               ZIndex="200">
-            <Border Background="{StaticResource OverlayBackgroundBrush}"/>
-            <Border Background="{StaticResource CardBackgroundBrush}"
+            <Border Background="{DynamicResource OverlayBackgroundBrush}"/>
+            <Border Background="{DynamicResource CardBackgroundBrush}"
                     CornerRadius="12"
                     Padding="24"
                     MaxWidth="400"
@@ -808,11 +1052,11 @@
               ZIndex="150">
             
             <!-- Dark Overlay -->
-            <Border Background="{StaticResource OverlayBackgroundBrush}"/>
+            <Border Background="{DynamicResource OverlayBackgroundBrush}"/>
             
             <!-- Onboarding Content -->
             <Border Classes="scaleIn"
-                    Background="{StaticResource CardBackgroundBrush}"
+                    Background="{DynamicResource CardBackgroundBrush}"
                     CornerRadius="16"
                     Padding="32"
                     MaxWidth="480"
@@ -839,7 +1083,7 @@
                     
                     <!-- Step 1 Content -->
                     <StackPanel Spacing="16" IsVisible="{Binding CurrentOnboardingStep, Converter={StaticResource StepToVisibility}, ConverterParameter=1}">
-                        <Border Width="64" Height="64" CornerRadius="32" Background="{StaticResource PrimaryLightBrush}" HorizontalAlignment="Center">
+                        <Border Width="64" Height="64" CornerRadius="32" Background="{DynamicResource PrimaryLightBrush}" HorizontalAlignment="Center">
                             <TextBlock Text="📥" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <TextBlock Classes="heading2" Text="{Binding OnboardingStep1Title}" HorizontalAlignment="Center"/>
@@ -848,7 +1092,7 @@
                     
                     <!-- Step 2 Content -->
                     <StackPanel Spacing="16" IsVisible="{Binding CurrentOnboardingStep, Converter={StaticResource StepToVisibility}, ConverterParameter=2}">
-                        <Border Width="64" Height="64" CornerRadius="32" Background="{StaticResource SuccessLightBrush}" HorizontalAlignment="Center">
+                        <Border Width="64" Height="64" CornerRadius="32" Background="{DynamicResource SuccessLightBrush}" HorizontalAlignment="Center">
                             <TextBlock Text="📞" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <TextBlock Classes="heading2" Text="{Binding OnboardingStep2Title}" HorizontalAlignment="Center"/>
@@ -857,25 +1101,25 @@
                         <!-- Action buttons preview -->
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12" Margin="0,8,0,0">
                             <StackPanel Spacing="4" HorizontalAlignment="Center">
-                                <Border Width="36" Height="36" CornerRadius="18" Background="{StaticResource SuccessLightBrush}" HorizontalAlignment="Center">
+                                <Border Width="36" Height="36" CornerRadius="18" Background="{DynamicResource SuccessLightBrush}" HorizontalAlignment="Center">
                                     <TextBlock Text="📞" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <TextBlock Classes="caption" Text="Nghe máy" HorizontalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Spacing="4" HorizontalAlignment="Center">
-                                <Border Width="36" Height="36" CornerRadius="18" Background="{StaticResource NeutralLightBrush}" HorizontalAlignment="Center">
+                                <Border Width="36" Height="36" CornerRadius="18" Background="{DynamicResource NeutralLightBrush}" HorizontalAlignment="Center">
                                     <TextBlock Text="🔕" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <TextBlock Classes="caption" Text="Không nghe" HorizontalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Spacing="4" HorizontalAlignment="Center">
-                                <Border Width="36" Height="36" CornerRadius="18" Background="{StaticResource ErrorLightBrush}" HorizontalAlignment="Center">
+                                <Border Width="36" Height="36" CornerRadius="18" Background="{DynamicResource ErrorLightBrush}" HorizontalAlignment="Center">
                                     <TextBlock Text="🚫" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <TextBlock Classes="caption" Text="Số sai" HorizontalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Spacing="4" HorizontalAlignment="Center">
-                                <Border Width="36" Height="36" CornerRadius="18" Background="{StaticResource WarningLightBrush}" HorizontalAlignment="Center">
+                                <Border Width="36" Height="36" CornerRadius="18" Background="{DynamicResource WarningLightBrush}" HorizontalAlignment="Center">
                                     <TextBlock Text="⏳" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <TextBlock Classes="caption" Text="Máy bận" HorizontalAlignment="Center"/>
@@ -885,7 +1129,7 @@
                     
                     <!-- Step 3 Content -->
                     <StackPanel Spacing="16" IsVisible="{Binding CurrentOnboardingStep, Converter={StaticResource StepToVisibility}, ConverterParameter=3}">
-                        <Border Width="64" Height="64" CornerRadius="32" Background="{StaticResource WarningLightBrush}" HorizontalAlignment="Center">
+                        <Border Width="64" Height="64" CornerRadius="32" Background="{DynamicResource WarningLightBrush}" HorizontalAlignment="Center">
                             <TextBlock Text="📤" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <TextBlock Classes="heading2" Text="{Binding OnboardingStep3Title}" HorizontalAlignment="Center"/>
@@ -921,7 +1165,7 @@
                             HorizontalAlignment="Center"
                             Padding="12,6"
                             FontSize="12"
-                            Foreground="{StaticResource TextMutedBrush}"/>
+                            Foreground="{DynamicResource TextMutedBrush}"/>
                 </StackPanel>
             </Border>
         </Grid>
@@ -934,23 +1178,23 @@
               ZIndex="200">
             
             <!-- Background Overlay -->
-            <Border Background="{StaticResource OverlayBackgroundBrush}"
+            <Border Background="{DynamicResource OverlayBackgroundBrush}"
                     PointerPressed="SettingsOverlay_PointerPressed"/>
             
             <!-- Settings Panel -->
-            <Border Background="{StaticResource CardBackgroundBrush}"
+            <Border Background="{DynamicResource CardBackgroundBrush}"
                     Width="520"
-                    MaxHeight="700"
                     CornerRadius="16"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
+                    Margin="40"
                     BoxShadow="0 8 32 0 #40000000">
                 
-                <Grid RowDefinitions="Auto,*">
+                <Grid RowDefinitions="Auto,*,Auto">
                     
                     <!-- Header with close button -->
                     <Border Grid.Row="0"
-                            BorderBrush="{StaticResource BorderLightBrush}"
+                            BorderBrush="{DynamicResource BorderLightBrush}"
                             BorderThickness="0,0,0,1"
                             Padding="20,16">
                         <Grid ColumnDefinitions="*,Auto">
@@ -968,14 +1212,14 @@
                     <ScrollViewer Grid.Row="1"
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled"
-                                  Padding="20">
+                                  Padding="20,20,20,0">
                         
-                        <StackPanel Spacing="20" DataContext="{Binding SettingsViewModel}">
+                        <StackPanel Spacing="20" DataContext="{Binding SettingsViewModel}" Margin="0,0,0,20">
                             
                             <!-- ═══════════════════════════════════════════════ -->
                             <!-- SECURITY SECTION -->
                             <!-- ═══════════════════════════════════════════════ -->
-                            <Border Background="{StaticResource AppBackgroundBrush}"
+                            <Border Background="{DynamicResource AppBackgroundBrush}"
                                     CornerRadius="12"
                                     Padding="16">
                                 <StackPanel Spacing="12">
@@ -986,15 +1230,15 @@
                                         <TextBlock Classes="heading3" Text="Security" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     
-                                    <Border Height="1" Background="{StaticResource BorderLightBrush}"/>
+                                    <Border Height="1" Background="{DynamicResource BorderLightBrush}"/>
                                     
                                     <!-- Unlocked State -->
                                     <StackPanel IsVisible="{Binding IsUnlocked}" Spacing="10">
                                         <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <TextBlock Text="✔️" FontSize="14" Foreground="{StaticResource SuccessTextBrush}"/>
+                                            <TextBlock Text="✔️" FontSize="14" Foreground="{DynamicResource SuccessTextBrush}"/>
                                             <TextBlock Text="Settings unlocked" 
                                                        Classes="body"
-                                                       Foreground="{StaticResource SuccessTextBrush}"
+                                                       Foreground="{DynamicResource SuccessTextBrush}"
                                                        FontWeight="Medium"/>
                                         </StackPanel>
                                         
@@ -1033,11 +1277,11 @@
                                         
                                         <!-- Password Error -->
                                         <Border IsVisible="{Binding ShowPasswordError}"
-                                                Background="{StaticResource ErrorLightBrush}"
+                                                Background="{DynamicResource ErrorLightBrush}"
                                                 CornerRadius="6"
                                                 Padding="10,8">
                                             <TextBlock Text="{Binding PasswordError}"
-                                                       Foreground="{StaticResource ErrorTextBrush}"
+                                                       Foreground="{DynamicResource ErrorTextBrush}"
                                                        FontSize="12"/>
                                         </Border>
                                     </StackPanel>
@@ -1047,7 +1291,7 @@
                             <!-- ═══════════════════════════════════════════════ -->
                             <!-- TELEGRAM BOT SECTION -->
                             <!-- ═══════════════════════════════════════════════ -->
-                            <Border Background="{StaticResource AppBackgroundBrush}"
+                            <Border Background="{DynamicResource AppBackgroundBrush}"
                                     CornerRadius="12"
                                     Padding="16"
                                     IsEnabled="{Binding IsUnlocked}">
@@ -1067,17 +1311,17 @@
                                         <TextBlock Classes="heading3" Text="Telegram Bot" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     
-                                    <Border Height="1" Background="{StaticResource BorderLightBrush}"/>
+                                    <Border Height="1" Background="{DynamicResource BorderLightBrush}"/>
                                     
                                     <!-- Locked Message -->
                                     <Border IsVisible="{Binding !IsUnlocked}"
-                                            Background="{StaticResource WarningLightBrush}"
+                                            Background="{DynamicResource WarningLightBrush}"
                                             CornerRadius="6"
                                             Padding="10,8">
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <TextBlock Text="🔒" FontSize="12"/>
                                             <TextBlock Text="Unlock để truy cập cài đặt này"
-                                                       Foreground="{StaticResource WarningTextBrush}"
+                                                       Foreground="{DynamicResource WarningTextBrush}"
                                                        FontSize="12"/>
                                         </StackPanel>
                                     </Border>
@@ -1092,7 +1336,7 @@
                                                      Watermark="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"/>
                                             <TextBlock IsVisible="{Binding ShowBotTokenError}"
                                                        Text="{Binding BotTokenError}"
-                                                       Foreground="{StaticResource ErrorTextBrush}"
+                                                       Foreground="{DynamicResource ErrorTextBrush}"
                                                        FontSize="11"/>
                                         </StackPanel>
                                         
@@ -1103,19 +1347,19 @@
                                                      Watermark="-1001234567890"/>
                                             <TextBlock IsVisible="{Binding ShowChatIdError}"
                                                        Text="{Binding ChatIdError}"
-                                                       Foreground="{StaticResource ErrorTextBrush}"
+                                                       Foreground="{DynamicResource ErrorTextBrush}"
                                                        FontSize="11"/>
                                         </StackPanel>
                                         
                                         <!-- Help Info -->
-                                        <Border Background="{StaticResource NeutralLightBrush}"
+                                        <Border Background="{DynamicResource NeutralLightBrush}"
                                                 CornerRadius="6"
                                                 Padding="10,8">
                                             <StackPanel Spacing="2">
                                                 <TextBlock Classes="caption" FontWeight="SemiBold" Text="💡 Hướng dẫn"/>
                                                 <TextBlock Classes="caption" 
                                                            TextWrapping="Wrap"
-                                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
                                                            FontSize="11"
                                                            LineHeight="16">
                                                     <Run Text="1. Tạo bot tại @BotFather"/>
@@ -1127,75 +1371,128 @@
                                             </StackPanel>
                                         </Border>
                                         
-                                        <!-- Action Buttons -->
-                                        <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,6,0,0">
-                                            <Button Grid.Column="1"
-                                                    Classes="secondary"
-                                                    Command="{Binding ClearSensitiveDataCommand}"
-                                                    Margin="0,0,10,0"
-                                                    Padding="12,8"
-                                                    ToolTip.Tip="Xóa toàn bộ cài đặt Telegram">
-                                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                                    <TextBlock Text="🗑️" FontSize="12"/>
-                                                    <TextBlock Text="Xóa"/>
-                                                </StackPanel>
-                                            </Button>
-                                            
-                                            <Button Grid.Column="2"
-                                                    Classes="primary"
-                                                    Command="{Binding SaveSettingsCommand}"
-                                                    IsEnabled="{Binding !IsSaving}"
-                                                    Padding="16,8">
-                                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                                    <TextBlock Text="💾" FontSize="12"/>
-                                                    <TextBlock>
-                                                        <TextBlock.Text>
-                                                            <Binding Path="IsSaving">
-                                                                <Binding.Converter>
-                                                                    <conv:BoolToSavingTextConverter/>
-                                                                </Binding.Converter>
-                                                            </Binding>
-                                                        </TextBlock.Text>
-                                                    </TextBlock>
-                                                </StackPanel>
-                                            </Button>
-                                        </Grid>
+                                        <!-- Clear Button -->
+                                        <Button Classes="secondary"
+                                                Command="{Binding ClearSensitiveDataCommand}"
+                                                HorizontalAlignment="Left"
+                                                Margin="0,6,0,0"
+                                                Padding="12,8"
+                                                ToolTip.Tip="Xóa toàn bộ cài đặt Telegram">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="🗑️" FontSize="12"/>
+                                                <TextBlock Text="Xóa cài đặt Telegram"/>
+                                            </StackPanel>
+                                        </Button>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
                             
-                            <!-- Status Message -->
-                            <Border IsVisible="{Binding ShowStatusMessage}"
-                                    CornerRadius="8"
-                                    Padding="12">
-                                <Panel>
-                                    <!-- Success -->
-                                    <Border IsVisible="{Binding IsStatusSuccess}"
-                                            Background="{StaticResource SuccessLightBrush}"
-                                            CornerRadius="8"
-                                            Margin="-12"
-                                            Padding="12">
-                                        <TextBlock Text="{Binding StatusMessage}"
-                                                   Foreground="{StaticResource SuccessTextBrush}"
-                                                   FontWeight="Medium"
-                                                   FontSize="12"/>
+                            <!-- ═══════════════════════════════════════════════ -->
+                            <!-- DAILY REPORT SECTION -->
+                            <!-- ═══════════════════════════════════════════════ -->
+                            <Border Background="{DynamicResource AppBackgroundBrush}"
+                                    CornerRadius="12"
+                                    Padding="16"
+                                    IsEnabled="{Binding IsUnlocked}">
+                                <Border.Opacity>
+                                    <Binding Path="IsUnlocked">
+                                        <Binding.Converter>
+                                            <conv:BoolToOpacityConverter/>
+                                        </Binding.Converter>
+                                    </Binding>
+                                </Border.Opacity>
+                                
+                                <StackPanel Spacing="12">
+                                    
+                                    <!-- Section Header -->
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Text="📊" FontSize="18"/>
+                                        <TextBlock Classes="heading3" Text="Daily Report" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    
+                                    <Border Height="1" Background="{DynamicResource BorderLightBrush}"/>
+                                    
+                                    <!-- Locked Message -->
+                                    <Border IsVisible="{Binding !IsUnlocked}"
+                                            Background="{DynamicResource WarningLightBrush}"
+                                            CornerRadius="6"
+                                            Padding="10,8">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Text="🔒" FontSize="12"/>
+                                            <TextBlock Text="Unlock để truy cập cài đặt này"
+                                                       Foreground="{DynamicResource WarningTextBrush}"
+                                                       FontSize="12"/>
+                                        </StackPanel>
                                     </Border>
-                                    <!-- Error -->
-                                    <Border IsVisible="{Binding !IsStatusSuccess}"
-                                            Background="{StaticResource ErrorLightBrush}"
-                                            CornerRadius="8"
-                                            Margin="-12"
-                                            Padding="12">
-                                        <TextBlock Text="{Binding StatusMessage}"
-                                                   Foreground="{StaticResource ErrorTextBrush}"
-                                                   FontWeight="Medium"
-                                                   FontSize="12"/>
-                                    </Border>
-                                </Panel>
+                                    
+                                    <!-- Daily Report Settings -->
+                                    <StackPanel IsVisible="{Binding IsUnlocked}" Spacing="14">
+                                        
+                                        <!-- Enable Auto Send Toggle -->
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <StackPanel Grid.Column="0" Spacing="2">
+                                                <TextBlock Classes="body" Text="Tự động gửi Daily Report" FontWeight="Medium"/>
+                                                <TextBlock Classes="caption" 
+                                                           Text="Gửi báo cáo tự động theo giờ cấu hình" 
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                            <ToggleSwitch Grid.Column="1" 
+                                                          IsChecked="{Binding EnableAutoSendDailyReport, Mode=TwoWay}"
+                                                          OnContent="Bật"
+                                                          OffContent="Tắt"/>
+                                        </Grid>
+                                        
+                                        <!-- Send Time Picker -->
+                                        <StackPanel Spacing="4" IsEnabled="{Binding EnableAutoSendDailyReport}">
+                                            <TextBlock Classes="body" Text="Giờ gửi báo cáo" FontWeight="Medium"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <ComboBox Width="70"
+                                                          SelectedItem="{Binding SelectedHour, Mode=TwoWay}"
+                                                          ItemsSource="{Binding AvailableHours}">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding StringFormat={}{0:D2}}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                                <TextBlock Text=":" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                <ComboBox Width="70"
+                                                          SelectedItem="{Binding SelectedMinute, Mode=TwoWay}"
+                                                          ItemsSource="{Binding AvailableMinutes}">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding StringFormat={}{0:D2}}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        
+                                        <!-- Info Box -->
+                                        <Border Background="{DynamicResource NeutralLightBrush}"
+                                                CornerRadius="6"
+                                                Padding="10,8">
+                                            <StackPanel Spacing="2">
+                                                <TextBlock Classes="caption" FontWeight="SemiBold" Text="💡 Ghi chú"/>
+                                                <TextBlock Classes="caption" 
+                                                           TextWrapping="Wrap"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           FontSize="11"
+                                                           LineHeight="16">
+                                                    <Run Text="• Daily Report tổng hợp cuộc gọi trong ngày"/>
+                                                    <LineBreak/>
+                                                    <Run Text="• Chỉ gửi khi app đang chạy"/>
+                                                    <LineBreak/>
+                                                    <Run Text="• Mỗi ngày chỉ gửi 1 lần"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
                             </Border>
                             
                             <!-- Security Info -->
-                            <Border Background="{StaticResource NeutralLightBrush}"
+                            <Border Background="{DynamicResource NeutralLightBrush}"
                                     CornerRadius="8"
                                     Padding="12">
                                 <StackPanel Spacing="4">
@@ -1204,7 +1501,7 @@
                                                Text="🛡️ Thông tin bảo mật"/>
                                     <TextBlock Classes="caption" 
                                                TextWrapping="Wrap"
-                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
                                                FontSize="11"
                                                LineHeight="16">
                                         <Run Text="• Mật khẩu SHA-256, không lưu plain text"/>
@@ -1218,6 +1515,69 @@
                             
                         </StackPanel>
                     </ScrollViewer>
+                    
+                    <!-- Fixed Footer with Save Button -->
+                    <Border Grid.Row="2"
+                            BorderBrush="{DynamicResource BorderLightBrush}"
+                            BorderThickness="0,1,0,0"
+                            Padding="20,16"
+                            Background="{DynamicResource CardBackgroundBrush}">
+                        <Grid ColumnDefinitions="*,Auto" DataContext="{Binding SettingsViewModel}">
+                            
+                            <!-- Status Message in Footer -->
+                            <Border Grid.Column="0"
+                                    IsVisible="{Binding ShowStatusMessage}"
+                                    CornerRadius="6"
+                                    Padding="10,6"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Left">
+                                <Panel>
+                                    <!-- Success -->
+                                    <Border IsVisible="{Binding IsStatusSuccess}"
+                                            Background="{DynamicResource SuccessLightBrush}"
+                                            CornerRadius="6"
+                                            Margin="-10,-6"
+                                            Padding="10,6">
+                                        <TextBlock Text="{Binding StatusMessage}"
+                                                   Foreground="{DynamicResource SuccessTextBrush}"
+                                                   FontWeight="Medium"
+                                                   FontSize="12"/>
+                                    </Border>
+                                    <!-- Error -->
+                                    <Border IsVisible="{Binding !IsStatusSuccess}"
+                                            Background="{DynamicResource ErrorLightBrush}"
+                                            CornerRadius="6"
+                                            Margin="-10,-6"
+                                            Padding="10,6">
+                                        <TextBlock Text="{Binding StatusMessage}"
+                                                   Foreground="{DynamicResource ErrorTextBrush}"
+                                                   FontWeight="Medium"
+                                                   FontSize="12"/>
+                                    </Border>
+                                </Panel>
+                            </Border>
+                            
+                            <!-- Save Button -->
+                            <Button Grid.Column="1"
+                                    Classes="primary"
+                                    Command="{Binding SaveSettingsCommand}"
+                                    IsEnabled="{Binding !IsSaving}"
+                                    Padding="20,10">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="💾" FontSize="14"/>
+                                    <TextBlock FontSize="14" FontWeight="Medium">
+                                        <TextBlock.Text>
+                                            <Binding Path="IsSaving">
+                                                <Binding.Converter>
+                                                    <conv:BoolToSavingTextConverter/>
+                                                </Binding.Converter>
+                                            </Binding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </Border>
                 </Grid>
             </Border>
         </Grid>
@@ -1230,7 +1590,7 @@
               ZIndex="300">
             
             <!-- Background Overlay -->
-            <Border Background="{StaticResource OverlayBackgroundBrush}"
+            <Border Background="{DynamicResource OverlayBackgroundBrush}"
                     PointerPressed="SendReportOverlay_PointerPressed"/>
             
             <!-- Send Report Panel -->
@@ -1244,5 +1604,35 @@
                 </ContentControl.ContentTemplate>
             </ContentControl>
         </Grid>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- DAILY REPORT PREVIEW POPUP OVERLAY -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="0" Grid.RowSpan="2"
+              IsVisible="{Binding ShowDailyReportPreview}"
+              ZIndex="350">
+            
+            <!-- Background Overlay -->
+            <Border Background="{DynamicResource OverlayBackgroundBrush}"
+                    PointerPressed="DailyReportPreviewOverlay_PointerPressed"/>
+            
+            <!-- Daily Report Preview Panel -->
+            <ContentControl Content="{Binding DailyReportPreviewViewModel}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                <ContentControl.ContentTemplate>
+                    <DataTemplate DataType="vm:DailyReportPreviewViewModel">
+                        <local:DailyReportPreviewView DataContext="{Binding}"/>
+                    </DataTemplate>
+                </ContentControl.ContentTemplate>
+            </ContentControl>
+        </Grid>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- TOAST NOTIFICATION OVERLAY -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <local:NotificationView Grid.Row="0" Grid.RowSpan="2"
+                                DataContext="{Binding NotificationViewModel}"
+                                ZIndex="999"/>
     </Grid>
 </Window>
